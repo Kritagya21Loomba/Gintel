@@ -1,0 +1,157 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #080c10;
+  --surface: #0d1117;
+  --border: #1e2d3d;
+  --accent: #00ff88;
+  --accent-dim: #00cc6a;
+  --amber: #f5a623;
+  --sky: #38bdf8;
+  --muted: #4a5568;
+  --text: #e2e8f0;
+  --text-dim: #8892a4;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: "DM Sans", sans-serif;
+  overflow-x: hidden;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+
+/* Scanline overlay */
+.scanlines::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.03) 2px,
+    rgba(0, 0, 0, 0.03) 4px
+  );
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* Noise texture */
+.noise::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 9998;
+  opacity: 0.4;
+}
+
+/* Grid background */
+.grid-bg {
+  background-image: 
+    linear-gradient(rgba(0, 255, 136, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 255, 136, 0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* Glow effects */
+.glow-accent {
+  box-shadow: 0 0 20px rgba(0, 255, 136, 0.3), 0 0 60px rgba(0, 255, 136, 0.1);
+}
+
+.glow-text {
+  text-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+}
+
+/* Score ring animation */
+@keyframes score-ring {
+  from { stroke-dashoffset: 314; }
+  to { stroke-dashoffset: var(--target-offset); }
+}
+
+.score-ring-path {
+  animation: score-ring 1.5s ease forwards;
+  animation-delay: 0.5s;
+}
+
+/* Stagger fade in */
+.stagger-child {
+  opacity: 0;
+  transform: translateY(16px);
+  animation: fadeUp 0.5s ease forwards;
+}
+
+@keyframes fadeUp {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Terminal cursor */
+.cursor::after {
+  content: "_";
+  animation: blink 1s step-end infinite;
+}
+
+@keyframes blink {
+  50% { opacity: 0; }
+}
+
+/* Heatmap cell */
+.heatmap-cell {
+  transition: transform 0.1s ease, opacity 0.1s ease;
+}
+.heatmap-cell:hover {
+  transform: scale(1.5);
+  z-index: 10;
+}
+
+/* Card hover */
+.card-hover {
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+.card-hover:hover {
+  border-color: rgba(0, 255, 136, 0.3);
+  transform: translateY(-2px);
+}
+
+/* Bar fill animation */
+@keyframes bar-fill {
+  from { width: 0%; }
+  to { width: var(--target-width); }
+}
+
+.bar-animated {
+  animation: bar-fill 1s ease forwards;
+  animation-delay: var(--delay, 0.1s);
+}
+
+/* PDF Export Mode */
+.pdf-export-mode nav.sticky {
+  position: relative !important;
+}
+
+.pdf-export-mode .scanlines::before,
+.pdf-export-mode .noise::after {
+  display: none !important;
+}
+
+.pdf-export-mode * {
+  animation: none !important;
+  transition: none !important;
+}
