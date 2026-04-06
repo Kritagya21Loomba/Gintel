@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { AuthProvider } from "@/lib/auth-provider";
+import { CustomCursor } from "@/components/ui/CustomCursor";
 
 export const metadata: Metadata = {
   title: "Gintel — GitHub Profile Intelligence Analyzer",
@@ -27,7 +28,10 @@ export default function RootLayout({
         />
       </head>
       <body className="bg-bg text-text antialiased">
-        <AuthProvider>{children}</AuthProvider>
+        <AuthProvider>
+          <CustomCursor />
+          {children}
+        </AuthProvider>
       </body>
     </html>
   );

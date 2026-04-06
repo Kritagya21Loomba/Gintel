@@ -31,23 +31,33 @@ body {
 }
 
 /* Scrollbar */
-::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: var(--bg); }
-::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--muted);
+}
 
 /* Scanline overlay */
 .scanlines::before {
   content: "";
   position: fixed;
   inset: 0;
-  background: repeating-linear-gradient(
-    0deg,
-    transparent,
-    transparent 2px,
-    rgba(0, 0, 0, 0.03) 2px,
-    rgba(0, 0, 0, 0.03) 4px
-  );
+  background: repeating-linear-gradient(0deg,
+      transparent,
+      transparent 2px,
+      rgba(0, 0, 0, 0.03) 2px,
+      rgba(0, 0, 0, 0.03) 4px);
   pointer-events: none;
   z-index: 9999;
 }
@@ -65,7 +75,7 @@ body {
 
 /* Grid background */
 .grid-bg {
-  background-image: 
+  background-image:
     linear-gradient(rgba(0, 255, 136, 0.03) 1px, transparent 1px),
     linear-gradient(90deg, rgba(0, 255, 136, 0.03) 1px, transparent 1px);
   background-size: 40px 40px;
@@ -82,8 +92,13 @@ body {
 
 /* Score ring animation */
 @keyframes score-ring {
-  from { stroke-dashoffset: 314; }
-  to { stroke-dashoffset: var(--target-offset); }
+  from {
+    stroke-dashoffset: 314;
+  }
+
+  to {
+    stroke-dashoffset: var(--target-offset);
+  }
 }
 
 .score-ring-path {
@@ -99,7 +114,10 @@ body {
 }
 
 @keyframes fadeUp {
-  to { opacity: 1; transform: translateY(0); }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Terminal cursor */
@@ -109,13 +127,16 @@ body {
 }
 
 @keyframes blink {
-  50% { opacity: 0; }
+  50% {
+    opacity: 0;
+  }
 }
 
 /* Heatmap cell */
 .heatmap-cell {
   transition: transform 0.1s ease, opacity 0.1s ease;
 }
+
 .heatmap-cell:hover {
   transform: scale(1.5);
   z-index: 10;
@@ -125,6 +146,7 @@ body {
 .card-hover {
   transition: border-color 0.2s ease, transform 0.2s ease;
 }
+
 .card-hover:hover {
   border-color: rgba(0, 255, 136, 0.3);
   transform: translateY(-2px);
@@ -132,8 +154,13 @@ body {
 
 /* Bar fill animation */
 @keyframes bar-fill {
-  from { width: 0%; }
-  to { width: var(--target-width); }
+  from {
+    width: 0%;
+  }
+
+  to {
+    width: var(--target-width);
+  }
 }
 
 .bar-animated {
@@ -154,4 +181,71 @@ body {
 .pdf-export-mode * {
   animation: none !important;
   transition: none !important;
+}
+
+/* ── Archetype feature prominence ─────────────────────────── */
+.archetype-glow {
+  position: relative;
+}
+
+.archetype-glow::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, var(--accent), transparent 60%);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* ── Score ring: use SVG filter only — no box-shadow ──────── */
+/* Ensure no box-shadow leaks onto ScoreRing */
+.score-ring-container {
+  filter: none !important;
+  box-shadow: none !important;
+}
+
+/* ── Better focus ring ────────────────────────────────────── */
+*:focus-visible {
+  outline: 1.5px solid rgba(0, 255, 136, 0.5);
+  outline-offset: 2px;
+}
+
+/* ── Section divider accent ───────────────────────────────── */
+.section-label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.section-label::before {
+  content: "";
+  width: 4px;
+  height: 16px;
+  background: var(--accent);
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+/* ── Stat cards ───────────────────────────────────────────── */
+.stat-value-glow {
+  text-shadow: 0 0 12px currentColor;
+}
+
+/* ── Responsive padding helpers ───────────────────────────── */
+@media (max-width: 640px) {
+  .px-responsive {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
+/* ── Cursor: hide default everywhere ─────────────────────── */
+html,
+body,
+* {
+  /* cursor: none is applied by the CustomCursor component via JS */
 }
