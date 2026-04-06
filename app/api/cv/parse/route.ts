@@ -15,13 +15,14 @@ export async function POST(req: Request) {
     if (file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf")) {
       // Polyfill DOMMatrix for pdf.js in Node.js environment
       if (typeof global.DOMMatrix === "undefined") {
-        (global as any).DOMMatrix = class DOMMatrix {
-          a=1; b=0; c=0; d=1; e=0; f=0;
-          constructor() {}
-          multiply() { return this; }
-          inverse() { return this; }
-          translate() { return this; }
-          scale() { return this; }
+        (global as any).DOMMatrix = function DOMMatrix() {
+          return {
+            a:1, b:0, c:0, d:1, e:0, f:0,
+            multiply: function() { return this; },
+            inverse: function() { return this; },
+            translate: function() { return this; },
+            scale: function() { return this; }
+          };
         };
       }
       
