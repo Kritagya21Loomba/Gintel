@@ -344,7 +344,7 @@ export function CVInsights({}: CVInsightsProps) {
               A healthy pacing waveform features varied distributions primarily resting in the <span className="text-accent font-bold">green</span> zone (&lt;20 words).
             </p>
             
-            <div className="mt-4 p-4 border border-border/50 bg-surface/10 rounded-xl overflow-x-auto custom-scrollbar flex items-end gap-[3px] min-h-[160px] pb-6 relative">
+            <div className="mt-4 p-4 border border-border/50 bg-surface/10 rounded-xl overflow-x-auto custom-scrollbar flex items-end gap-1 h-48 pb-6 relative">
               {/* Baseline markers */}
               <div className="absolute left-0 right-0 bottom-6 border-b border-dashed border-border/40 z-0"></div>
               
@@ -360,7 +360,7 @@ export function CVInsights({}: CVInsightsProps) {
                 return (
                   <div 
                     key={idx}
-                    className={`w-2.5 rounded-t-sm transition-all duration-300 hover:opacity-100 z-10 ${colorClass} hover:brightness-125 cursor-crosshair group relative`}
+                    className={`w-2.5 shrink-0 rounded-t-sm transition-all duration-300 hover:opacity-100 z-10 ${colorClass} hover:brightness-125 cursor-crosshair group relative`}
                     style={{ height: `${heightPercentage}%` }}
                   >
                     <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-surface border border-border px-2 py-1 rounded font-mono text-[10px] text-text whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity z-20 pointer-events-none">
