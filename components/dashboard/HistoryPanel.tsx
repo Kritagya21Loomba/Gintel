@@ -60,9 +60,12 @@ function CustomTooltip({ active, payload, label }: any) {
 export function HistoryPanel({ data }: HistoryPanelProps) {
   const [history, setHistory] = useState<HistoricalSnapshot[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
+  
+  // Isolate cache records by GitHub username so Demo Profiles and Live distinct User profiles don't corrupt each other
+  const cacheKey = `gintel_history_${data.profile.username}`;
 
   useEffect(() => {
-    const cached = localStorage.getItem("gintel_history");
+    const cached = localStorage.getItem(cacheKey);
     if (cached) {
       try {
         setHistory(JSON.parse(cached));
@@ -71,7 +74,7 @@ export function HistoryPanel({ data }: HistoryPanelProps) {
       }
     }
     setIsLoaded(true);
-  }, []);
+  }, [cacheKey]);
 
   const totalCommitsYear = data.totalCommitsYear;
   const topRepoStars = data.topRepos[0]?.stars || 0;
@@ -111,7 +114,7 @@ export function HistoryPanel({ data }: HistoryPanelProps) {
     const newHistory = [...history, newSnapshot].sort((a,b) => a.timestamp - b.timestamp);
     
     setHistory(newHistory);
-    localStorage.setItem("gintel_history", JSON.stringify(newHistory));
+    localStorage.setItem(cacheKey, JSON.stringify(newHistory));
   };
 
   if (!isLoaded) return null;
