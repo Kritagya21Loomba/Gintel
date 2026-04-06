@@ -54,6 +54,11 @@ export function RecommendationCard({ rec, index }: RecommendationCardProps) {
             >
               {impact.label}
             </span>
+            {rec.estimatedScoreImpact ? (
+              <span className="font-mono text-[9px] font-bold text-accent bg-accent/10 px-1.5 py-0.5 rounded ml-auto">
+                +{rec.estimatedScoreImpact} SCORE EXPT
+              </span>
+            ) : null}
           </div>
           <p className="font-body text-xs text-text-dim leading-relaxed">{rec.description}</p>
         </div>

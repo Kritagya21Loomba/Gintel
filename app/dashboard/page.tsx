@@ -19,6 +19,8 @@ import { CareerAlignmentChart } from "@/components/charts/CareerAlignmentChart";
 import { ContributionHeatmap } from "@/components/charts/ContributionHeatmap";
 import { formatNumber } from "@/lib/utils";
 import type { AnalysisResult } from "@/types";
+import { RedFlags } from "@/components/ui/RedFlags";
+import { ProfileCompleteness } from "@/components/ui/ProfileCompleteness";
 import { Loader2, ChevronDown, ChevronRight } from "lucide-react";
 import { ProSection } from "@/components/pro/ProSection";
 
@@ -225,6 +227,27 @@ function DashboardContent() {
                   {data.contributionHeatmap.filter((d) => d.count > 0).length}
                 </span>
               </div>
+            </div>
+          </SectionCard>
+        </div>
+
+        <RedFlags flags={data.redFlags} />
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <ProfileCompleteness score={data.completeness} />
+          
+          <SectionCard title="GitHub Ecosystem" badge="DEPENDENCIES" className="mb-4">
+            <div className="flex flex-wrap gap-2 mt-4">
+              {(() => {
+                const depSet = new Set(data.topRepos.flatMap(r => r.dependencyFiles || []));
+                const allDeps = Array.from(depSet);
+                if (allDeps.length === 0) return <span className="text-muted text-xs">No frameworks or major dependencies detected.</span>;
+                return allDeps.map(dep => (
+                  <span key={dep} className="px-2 py-1 text-[10px] font-mono border border-accent/20 bg-accent/[0.02] text-text-dim rounded">
+                    {dep}
+                  </span>
+                ));
+              })()}
             </div>
           </SectionCard>
         </div>
