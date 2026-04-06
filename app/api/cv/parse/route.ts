@@ -25,7 +25,15 @@ export async function POST(req: Request) {
         };
       }
       
-      const pdfParse = (await import("pdf-parse")).default;
+      let pdfParse: any;
+      if (typeof require !== 'undefined') {
+        // Fallback to CJS require in Node environment
+        pdfParse = require("pdf-parse");
+      } else {
+        const pdfModule = await import("pdf-parse");
+        pdfParse = pdfModule.default || pdfModule;
+      }
+      
       const data = await pdfParse(buffer);
       text = data.text;
     } else if (
