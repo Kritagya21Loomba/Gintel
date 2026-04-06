@@ -31,8 +31,22 @@ export function CVInsights({}: CVInsightsProps) {
       });
 
       if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || "Failed to parse document");
+        let errorMsg = "Failed to parse document";
+        try {
+          const text = await res.text();
+          try {
+            const data = JSON.parse(text);
+            errorMsg = data.error || errorMsg;
+          } catch {
+            const temp = document.createElement("div");
+            temp.innerHTML = text;
+            const heading = temp.querySelector("h1")?.innerText || temp.querySelector("h2")?.innerText || text.slice(0, 150);
+            errorMsg = `Server Error: ${heading}`;
+          }
+        } catch {
+          errorMsg = "Network error or invalid response";
+        }
+        throw new Error(errorMsg);
       }
 
       const data = await res.json();
