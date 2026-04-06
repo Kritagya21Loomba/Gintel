@@ -9,7 +9,17 @@ export interface GitHubProfile {
   company: string | null;
   location: string | null;
   blog: string | null;
+  twitterUsername: string | null;
   createdAt: string;
+}
+
+export interface RepoQualityCard {
+  readme: number;
+  activity: number;
+  tests: number;
+  deployment: number;
+  description: number;
+  total: number;
 }
 
 export interface Repository {
@@ -20,10 +30,16 @@ export interface Repository {
   language: string | null;
   topics: string[];
   updatedAt: string;
+  createdAt: string;
+  pushedAt: string;
   url: string;
   readmeScore: number; // 0–100
   impactScore: number; // 0–100
   isForked: boolean;
+  hasPages: boolean;
+  isPinned: boolean;
+  dependencyFiles: string[];
+  qualityCard?: RepoQualityCard;
 }
 
 export interface LanguageStat {
@@ -49,6 +65,17 @@ export interface ScoreBreakdown {
   dimensions: ScoreDimension[];
 }
 
+export interface RedFlag {
+  id: string;
+  title: string;
+  description: string;
+}
+
+export interface CompletenessScore {
+  score: number; // 0 to 8
+  checks: { label: string; passed: boolean }[];
+}
+
 export interface AnalysisResult {
   profile: GitHubProfile;
   portfolioScore: number;
@@ -65,6 +92,8 @@ export interface AnalysisResult {
   totalCommitsYear: number;
   mostProductiveMonth: string;
   contributionHeatmap: HeatmapDay[];
+  redFlags: RedFlag[];
+  completeness: CompletenessScore;
 }
 
 export interface CareerAlignment {
@@ -85,6 +114,7 @@ export interface Recommendation {
   title: string;
   description: string;
   impact: "high" | "medium" | "low";
+  estimatedScoreImpact?: number;
 }
 
 export interface HeatmapDay {
