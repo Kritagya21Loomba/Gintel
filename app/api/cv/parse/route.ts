@@ -26,21 +26,10 @@ export async function POST(req: Request) {
         };
       }
       
-      let pdfParseObj: any;
-      if (typeof require !== 'undefined') {
-        // Fallback to CJS require in Node environment
-        pdfParseObj = require("pdf-parse");
-      } else {
-        pdfParseObj = await import("pdf-parse");
-      }
+      const pdfModule = await import("pdf-parse");
+      const pdfParseFunc = typeof pdfModule === "function" ? pdfModule : (pdfModule.default || pdfModule);
       
-      const pdfParserFunc = typeof pdfParseObj === 'function' ? pdfParseObj : (pdfParseObj.default || pdfParseObj.PDFParse || pdfParseObj);
-      
-      if (typeof pdfParserFunc !== 'function') {
-        throw new Error(`pdf-parse resolved to ${typeof pdfParserFunc}, expected function`);
-      }
-      
-      const data = await pdfParserFunc(buffer);
+      const data = await pdfParseFunc(buffer);
       text = data.text;
     } else if (
       file.type === "application/vnd.openxmlformats-officedocument.wordprocessingml.document" || 
