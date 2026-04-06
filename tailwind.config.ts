@@ -11,6 +11,7 @@ const config: Config = {
       fontFamily: {
         mono: ["'JetBrains Mono'", "monospace"],
         display: ["'Syne'", "sans-serif"],
+        wordmark: ["'Orbitron'", "sans-serif"],
         body: ["'DM Sans'", "sans-serif"],
       },
       colors: {
@@ -20,6 +21,8 @@ const config: Config = {
         accent: "#00ff88",
         "accent-dim": "#00cc6a",
         "accent-muted": "rgba(0,255,136,0.08)",
+        cyan: "#22d3ee",
+        "cyan-dim": "#0891b2",
         amber: "#f5a623",
         sky: "#38bdf8",
         muted: "#4a5568",

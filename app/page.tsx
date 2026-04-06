@@ -136,15 +136,15 @@ export default function Home() {
               <GintelLogo size={28} />
             </div>
             <div className="flex items-baseline gap-2">
-              <span className="font-mono text-accent text-sm font-bold tracking-widest">GINTEL</span>
-              <span className="font-mono text-muted text-[10px]">v0.2.0</span>
+              <span className="font-mono text-sm font-bold tracking-widest" style={{ fontFamily: "'Orbitron', sans-serif", color: "var(--accent)" }}>GINTEL</span>
+              <span className="font-mono text-muted text-[10px]" style={{ color: "var(--cyan-dim)" }}>v0.2.0</span>
             </div>
           </div>
 
           <div className="flex items-center gap-4">
             <span className="font-mono text-xs text-text-dim hidden md:flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse inline-block" />
-              LIVE BETA
+              <span className="w-1.5 h-1.5 rounded-full animate-pulse inline-block" style={{ background: "var(--cyan)" }} />
+              <span style={{ color: "var(--cyan)" }}>LIVE BETA</span>
             </span>
             {isLoggedIn && (
               <div className="flex items-center gap-2 border border-border/50 rounded-full pl-1 pr-3 py-1">
@@ -163,9 +163,9 @@ export default function Home() {
 
         {/* Hero */}
         <section className="relative z-10 max-w-5xl mx-auto px-6 pt-24 pb-20 text-center">
-          <div className="inline-flex items-center gap-2 border border-accent/20 bg-accent/5 rounded-full px-4 py-1.5 mb-10 stagger-child">
-            <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
-            <span className="font-mono text-xs text-accent/80 tracking-widest">
+          <div className="inline-flex items-center gap-2 border border-border/50 bg-surface/60 rounded-full px-4 py-1.5 mb-10 stagger-child">
+            <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: "var(--cyan)" }} />
+            <span className="font-mono text-xs tracking-widest" style={{ color: "var(--cyan)" }}>
               GITHUB INTELLIGENCE LAYER
             </span>
           </div>
@@ -278,7 +278,7 @@ export default function Home() {
                 { label: "Insights generated", value: metrics?.insightsGenerated || 94331 },
               ].map((s) => (
                 <div key={s.label} className="text-center px-10">
-                  <div className="font-display font-extrabold text-3xl text-accent">
+                  <div className="font-display font-extrabold text-3xl" style={{ color: "var(--cyan)" }}>
                     <AnimatedCounter target={s.value} />
                   </div>
                   <div className="font-mono text-xs text-muted mt-1">{s.label}</div>

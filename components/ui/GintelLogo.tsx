@@ -185,14 +185,17 @@ export function LoadingScreen({ onComplete }: LoadingScreenProps) {
           {/* Big impact wordmark */}
           <span
             style={{
-              fontFamily: "'Syne', sans-serif",
-              fontWeight: 800,
+              fontFamily: "'Orbitron', sans-serif",
+              fontWeight: 900,
               fontSize: "52px",
-              letterSpacing: "0.15em",
+              letterSpacing: "0.2em",
               lineHeight: 1,
               color: "#00ff88",
+              display: "inline-block",
+              background: "none",
+              WebkitBackgroundClip: "unset",
               textShadow: isGlowing
-                ? "0 0 30px rgba(0,255,136,0.5), 0 0 80px rgba(0,255,136,0.15)"
+                ? "0 0 20px rgba(0,255,136,0.6), 0 0 60px rgba(0,255,136,0.2), 0 0 120px rgba(0,255,136,0.08)"
                 : "none",
               transition: "text-shadow 0.8s ease",
             }}

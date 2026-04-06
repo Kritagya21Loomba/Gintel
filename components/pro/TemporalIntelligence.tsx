@@ -39,13 +39,10 @@ export function TemporalIntelligence({ temporal }: Props) {
 
   function handleCellEnter(e: React.MouseEvent, day: string, hour: number, intensity: number) {
     const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
-    const containerRect = (e.currentTarget as HTMLElement)
-      .closest(".heatmap-container")!
-      .getBoundingClientRect();
     setTooltip({
       visible: true,
-      x: rect.left - containerRect.left + rect.width / 2,
-      y: rect.top - containerRect.top,
+      x: rect.left + rect.width / 2,
+      y: rect.top,
       day, hour, intensity,
     });
   }
@@ -124,10 +121,10 @@ export function TemporalIntelligence({ temporal }: Props) {
               </div>
             ))}
 
-            {/* Custom tooltip */}
+            {/* Custom tooltip — fixed so it's never clipped by overflow containers */}
             {tooltip.visible && (
               <div
-                className="absolute z-50 pointer-events-none"
+                className="fixed z-[9999] pointer-events-none"
                 style={{
                   left: tooltip.x,
                   top: tooltip.y - 8,
@@ -187,7 +184,7 @@ export function TemporalIntelligence({ temporal }: Props) {
                 </div>
                 <span className="font-mono text-[10px] text-muted flex-shrink-0">{tech.lastSeen}</span>
                 <span className={`font-mono text-[9px] px-1.5 py-0.5 rounded capitalize flex-shrink-0 ${tech.status === "active" ? "text-accent bg-accent/10" :
-                    tech.status === "graduated" ? "text-amber bg-amber/10" : "text-muted bg-surface"
+                  tech.status === "graduated" ? "text-amber bg-amber/10" : "text-muted bg-surface"
                   }`}>{tech.status}</span>
               </div>
             ))}
@@ -197,12 +194,12 @@ export function TemporalIntelligence({ temporal }: Props) {
 
       {/* Burnout signals */}
       <div className={`border rounded-lg p-3 ${temporal.burnoutSignals.risk === "high" ? "border-red-500/30 bg-red-500/[0.03]" :
-          temporal.burnoutSignals.risk === "moderate" ? "border-amber/30 bg-amber/[0.03]" :
-            "border-accent/15 bg-accent/[0.02]"
+        temporal.burnoutSignals.risk === "moderate" ? "border-amber/30 bg-amber/[0.03]" :
+          "border-accent/15 bg-accent/[0.02]"
         }`}>
         <div className="flex items-center gap-2 mb-2">
           <span className={`font-mono text-xs font-bold ${temporal.burnoutSignals.risk === "high" ? "text-red-400" :
-              temporal.burnoutSignals.risk === "moderate" ? "text-amber" : "text-accent"
+            temporal.burnoutSignals.risk === "moderate" ? "text-amber" : "text-accent"
             }`}>
             BURNOUT RISK: {temporal.burnoutSignals.risk.toUpperCase()}
           </span>
