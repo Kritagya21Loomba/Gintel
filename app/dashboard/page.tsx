@@ -195,11 +195,7 @@ function DashboardContent() {
                   </div>
                 </SectionCard>
               </div>
-            </>
-          )}
 
-          {activeTab === "portfolio" && (
-            <>
               {/* Main grid */}
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
                 {/* Language breakdown — col 1 */}
@@ -248,11 +244,25 @@ function DashboardContent() {
                     const depSet = new Set(data.topRepos.flatMap(r => r.dependencyFiles || []));
                     const allDeps = Array.from(depSet);
                     if (allDeps.length === 0) return <span className="text-muted text-xs">No frameworks or major dependencies detected.</span>;
-                    return allDeps.map(dep => (
-                      <span key={dep} className="px-2 py-1 text-[10px] font-mono border border-accent/20 bg-accent/[0.02] text-text-dim rounded">
-                        {dep}
-                      </span>
-                    ));
+                    
+                    let insight = "";
+                    if (allDeps.some(d => ["package.json", "tailwind.config.js", "next.config.js", "vite.config.ts"].includes(d))) insight = "Strong front-end and full-stack JavaScript signals.";
+                    else if (allDeps.some(d => ["requirements.txt", "Pipfile", "environment.yml", "setup.py"].includes(d))) insight = "Python data science / backend signals detected.";
+                    else if (allDeps.some(d => ["docker-compose.yml", "Dockerfile", "kubernetes"].includes(d))) insight = "DevOps and containerization experience highlighted.";
+                    else insight = "Diverse technical stack detected.";
+
+                    return (
+                      <div className="flex flex-col gap-3 w-full">
+                        <p className="font-mono text-xs text-text-dim border-l-2 border-accent pl-2">{insight}</p>
+                        <div className="flex flex-wrap gap-2">
+                          {allDeps.map(dep => (
+                            <span key={dep} className="px-2 py-1 text-[10px] font-mono border border-accent/20 bg-accent/[0.02] text-text-dim rounded">
+                              {dep}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    );
                   })()}
                 </div>
               </SectionCard>
@@ -274,7 +284,7 @@ function DashboardContent() {
             </>
           )}
 
-          {activeTab === "intelligence" && (
+          {activeTab === "recommendations" && (
             <>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <ProfileCompleteness score={data.completeness} />
@@ -317,7 +327,7 @@ function DashboardContent() {
 
               {/* Recommendations */}
               <SectionCard
-                title="Intelligence Recommendations"
+                title="Recommendations"
                 badge={`${data.recommendations.length} INSIGHTS`}
                 className="mb-4"
               >
