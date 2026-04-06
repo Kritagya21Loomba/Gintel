@@ -55,8 +55,8 @@ function DashboardContent() {
   const [hasStarredCV, setHasStarredCV] = useState<boolean | null>(null);
   const [verifyingStar, setVerifyingStar] = useState(false);
 
-  const verifyStar = async () => {
-    setVerifyingStar(true);
+  const verifyStar = async (quiet = false) => {
+    if (!quiet) setVerifyingStar(true);
     try {
       const res = await fetch("/api/github/check-star");
       if (res.ok) {
@@ -68,16 +68,18 @@ function DashboardContent() {
     } catch (e) {
       setHasStarredCV(false);
     }
-    setVerifyingStar(false);
+    if (!quiet) setVerifyingStar(false);
   };
 
   useEffect(() => {
-    if (activeTab === "cv-insights" && hasStarredCV === null && mode === "live") {
-      verifyStar();
-    } else if (mode === "mock") {
+    if (activeTab === "cv-insights" && mode === "live") {
+      // Quietly re-verify every time the tab is opened. Show loader only if it's the first time.
+      const isFirstTime = hasStarredCV === null;
+      verifyStar(!isFirstTime);
+    } else if (mode === "mock" && activeTab === "cv-insights") {
       setHasStarredCV(true); // Auto bypass for mock mode
     }
-  }, [activeTab, hasStarredCV, mode]);
+  }, [activeTab, mode]);
 
   useEffect(() => {
     async function loadData() {

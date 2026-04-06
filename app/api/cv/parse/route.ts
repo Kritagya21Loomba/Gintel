@@ -1,6 +1,4 @@
 import { NextResponse } from "next/server";
-import pdf from "pdf-parse";
-import mammoth from "mammoth";
 
 export async function POST(req: Request) {
   try {
@@ -15,21 +13,23 @@ export async function POST(req: Request) {
     let text = "";
 
     if (file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf")) {
-      const data = await pdf(buffer);
+      const pdfParse = (await import("pdf-parse")).default;
+      const data = await pdfParse(buffer);
       text = data.text;
     } else if (
       file.type === "application/vnd.openxmlformats-officedocument.wordprocessingml.document" || 
       file.name.toLowerCase().endsWith(".docx")
     ) {
+      const mammoth = (await import("mammoth")).default;
       const result = await mammoth.extractRawText({ buffer });
       text = result.value;
     } else {
-      return NextResponse.json({ error: "Unsupported file type. Only PDF and DOCX." }, { status: 400 });
+      return NextResponse.json({ error: `Unsupported file type: ${file.type}` }, { status: 400 });
     }
 
     return NextResponse.json({ text });
   } catch (error: any) {
-    console.error("Parse Error:", error);
-    return NextResponse.json({ error: "Failed to parse document." }, { status: 500 });
+    console.error("Parse Error Details:", error);
+    return NextResponse.json({ error: `Dynamic Parse Error: ${error?.message || String(error)}` }, { status: 500 });
   }
 }
