@@ -26,6 +26,7 @@ import { Loader2, ChevronDown, ChevronRight } from "lucide-react";
 import { ProSection } from "@/components/pro/ProSection";
 import { CVInsights } from "@/components/dashboard/CVInsights";
 import { StarGatePrompt } from "@/components/ui/StarGatePrompt";
+import { HistoryPanel } from "@/components/dashboard/HistoryPanel";
 
 export default function DashboardPage() {
   return (
@@ -256,15 +257,21 @@ function DashboardContent() {
                 </SectionCard>
 
                 {/* Career alignment — col 3 */}
-                <SectionCard title="Career Alignment" badge="ROLE MATCH">
+                <SectionCard title="Career Alignment" badge="ROLE MATCH" className="flex flex-col h-full">
                   <CareerAlignmentChart data={data.careerAlignment} />
-                  <div className="mt-4 pt-3 border-t border-border/50">
-                    <p className="font-mono text-[10px] text-muted">
-                      Best fit →{" "}
-                      <span className="text-accent font-bold">
-                        {data.careerAlignment[0]?.role} ({data.careerAlignment[0]?.score}%)
-                      </span>
-                    </p>
+                  <div className="mt-auto pt-4 border-t border-border/50">
+                    <h4 className="font-mono text-[10px] text-text-dim tracking-widest mb-3 uppercase">Top 3 Core Pathways</h4>
+                    <div className="flex flex-col gap-2">
+                       {data.careerAlignment.slice(0,3).map((r, i) => (
+                           <div key={r.role} className="flex items-center justify-between p-2 rounded bg-surface/30 border border-border/30">
+                              <div className="flex items-center gap-3">
+                                <span className={`font-mono text-sm font-bold ${i===0 ? 'text-[#f5a623]' : i===1 ? 'text-slate-400' : 'text-[#b45309]'}`}>#{i+1}</span>
+                                <span className="font-mono text-[11px] text-text">{r.role}</span>
+                              </div>
+                              <span className="font-mono text-[11px] text-accent font-bold">{r.score}% Match</span>
+                           </div>
+                       ))}
+                    </div>
                   </div>
                 </SectionCard>
               </div>
@@ -392,6 +399,12 @@ function DashboardContent() {
               ) : (
                 <CVInsights isDemo={mode === "mock"} />
               )}
+            </div>
+          )}
+
+          {activeTab === "history" && (
+            <div className="animate-in fade-in duration-300">
+               <HistoryPanel data={data} />
             </div>
           )}
         </div>
