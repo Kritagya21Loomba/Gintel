@@ -2,6 +2,64 @@ import { useState, useEffect } from "react";
 import { UploadCloud, FileText, CheckCircle2, AlertTriangle, Info, Zap, Target, BookOpen, Layers, XCircle, FileBarChart, ExternalLink, ChevronDown, ChevronUp } from "lucide-react";
 import { SectionCard } from "@/components/ui/SectionCard";
 
+function WaveformVisualizer({ sentenceLengths }: { sentenceLengths: any[] }) {
+  const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
+
+  return (
+    <div className="w-full">
+      <div className="h-10 mb-2 flex items-center justify-center font-mono text-xs border border-border/30 rounded bg-surface/20">
+        {hoveredIdx !== null ? (
+           <div className="flex items-center gap-3 animate-in fade-in">
+              <span className="font-bold text-accent">{sentenceLengths[hoveredIdx].length || sentenceLengths[hoveredIdx]} words:</span>
+              <span className="text-text-dim px-4 italic">"{sentenceLengths[hoveredIdx].snippet || "Sentence segment..."}"</span>
+           </div>
+        ) : (
+           <span className="text-muted/50 italic animate-in fade-in">Hover a spike to preview sentence length payload</span>
+        )}
+      </div>
+
+      <div className="p-4 border border-border/50 bg-surface/10 rounded-xl overflow-x-auto custom-scrollbar flex items-end gap-1 h-36 pb-6 relative">
+        <div className="absolute left-0 right-0 bottom-6 border-b border-dashed border-border/40 z-0"></div>
+        
+        {sentenceLengths.map((obj: any, idx: number) => {
+          const len = obj.length || obj;
+          const clampedLen = Math.min(len, 60); 
+          const heightPercentage = Math.max((clampedLen / 60) * 100, 4);
+          
+          let colorClass = "bg-accent";
+          if (len >= 20 && len <= 35) colorClass = "bg-amber";
+          if (len > 35) colorClass = "bg-red-500 opacity-80";
+
+          return (
+            <div 
+              key={idx}
+              onMouseEnter={() => setHoveredIdx(idx)}
+              onMouseLeave={() => setHoveredIdx(null)}
+              className={`w-3 shrink-0 rounded-t-sm transition-all duration-200 z-10 ${colorClass} hover:brightness-125 hover:opacity-80 cursor-crosshair`}
+              style={{ height: `${heightPercentage}%` }}
+            />
+          );
+        })}
+      </div>
+      
+      <div className="flex gap-6 mt-3 pb-2 pl-1">
+        <div className="flex items-center gap-2">
+           <div className="w-3 h-3 rounded bg-accent"></div>
+           <span className="font-mono text-[10px] text-text-dim tracking-wider uppercase">Optimal (&lt;20)</span>
+        </div>
+        <div className="flex items-center gap-2">
+           <div className="w-3 h-3 rounded bg-amber"></div>
+           <span className="font-mono text-[10px] text-text-dim tracking-wider uppercase">Heavy (20-35)</span>
+        </div>
+        <div className="flex items-center gap-2">
+           <div className="w-3 h-3 rounded bg-red-500 opacity-80"></div>
+           <span className="font-mono text-[10px] text-text-dim tracking-wider uppercase">Run-on (35+)</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // Helper component for uniform insight cards
 function InsightCard({ 
   title, icon: Icon, value, label, message, status, 
@@ -374,56 +432,13 @@ export function CVInsights({ isDemo }: CVInsightsProps) {
       {insights && insights.sentenceLengths && insights.sentenceLengths.length > 0 && (
         <SectionCard title="Chronological Pacing Waveform" badge="STRUCTURAL VISUALIZER">
           <div className="flex flex-col gap-4">
-            <p className="font-mono text-sm text-text-dim leading-relaxed max-w-3xl">
+            <p className="font-mono text-[11px] text-text-dim leading-relaxed max-w-3xl">
               This universal topological map plots the length of every sentence chronologically across your document. 
               Massive <span className="text-red-400 font-bold">red</span> spikes indicate run-on sentences or unwieldy paragraphs that fatigue the reader. 
               A healthy pacing waveform features varied distributions primarily resting in the <span className="text-accent font-bold">green</span> zone (&lt;20 words).
             </p>
             
-            <div className="mt-4 p-4 border border-border/50 bg-surface/10 rounded-xl overflow-x-auto custom-scrollbar flex items-end gap-1 h-48 pb-6 relative">
-              {/* Baseline markers */}
-              <div className="absolute left-0 right-0 bottom-6 border-b border-dashed border-border/40 z-0"></div>
-              
-              {insights.sentenceLengths.map((obj: any, idx: number) => {
-                const len = obj.length || obj; // Fallback just in case some legacy localstorage payload had number array
-                const snippet = obj.snippet || "Sentence segment";
-                // Max height capping for visualization scale (cap at 60 words for UI bounds)
-                const clampedLen = Math.min(len, 60); 
-                const heightPercentage = Math.max((clampedLen / 60) * 100, 4); // Min 4% height
-                
-                let colorClass = "bg-accent"; // < 20
-                if (len >= 20 && len <= 35) colorClass = "bg-amber";
-                if (len > 35) colorClass = "bg-red-500 opacity-80";
-
-                return (
-                  <div 
-                    key={idx}
-                    className={`w-2.5 shrink-0 rounded-t-sm transition-all duration-300 hover:opacity-100 z-10 ${colorClass} hover:brightness-125 cursor-crosshair group relative`}
-                    style={{ height: `${heightPercentage}%` }}
-                  >
-                    <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-surface border border-border px-3 py-1.5 rounded font-mono text-[10px] text-text whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity z-20 pointer-events-none flex flex-col items-center gap-1 shadow-xl">
-                      <span className="font-bold text-accent">{len} words</span>
-                      <span className="text-text-dim max-w-[150px] whitespace-normal text-center leading-tight">"{snippet}"</span>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-            
-            <div className="flex gap-6 mt-2 pb-2">
-              <div className="flex items-center gap-2">
-                 <div className="w-3 h-3 rounded bg-accent"></div>
-                 <span className="font-mono text-xs text-text-dim">Optimal (&lt;20)</span>
-              </div>
-              <div className="flex items-center gap-2">
-                 <div className="w-3 h-3 rounded bg-amber"></div>
-                 <span className="font-mono text-xs text-text-dim">Heavy (20-35)</span>
-              </div>
-              <div className="flex items-center gap-2">
-                 <div className="w-3 h-3 rounded bg-red-500 opacity-80"></div>
-                 <span className="font-mono text-xs text-text-dim">Run-on (35+)</span>
-              </div>
-            </div>
+            <WaveformVisualizer sentenceLengths={insights.sentenceLengths} />
           </div>
         </SectionCard>
       )}
