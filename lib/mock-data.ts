@@ -5,6 +5,8 @@ import {
   computeSkillRadar,
   classifyArchetype,
   generateRecommendations,
+  detectRedFlags,
+  computeProfileCompleteness,
 } from "./scoring-engine";
 
 const profile = {
@@ -18,6 +20,7 @@ const profile = {
   company: "@vercel",
   location: "San Francisco, CA",
   blog: "alexchen.dev",
+  twitterUsername: "alexchen",
   createdAt: "2019-03-12",
 };
 
@@ -34,6 +37,11 @@ const topRepos = [
     readmeScore: 88,
     impactScore: 91,
     isForked: false,
+    hasPages: false,
+    isPinned: true,
+    dependencyFiles: ["package.json"],
+    createdAt: "2022-01-01",
+    pushedAt: "2024-01-15",
   },
   {
     name: "ml-pipeline-kit",
@@ -47,6 +55,11 @@ const topRepos = [
     readmeScore: 72,
     impactScore: 78,
     isForked: false,
+    hasPages: false,
+    isPinned: true,
+    dependencyFiles: ["requirements.txt"],
+    createdAt: "2023-01-01",
+    pushedAt: "2023-11-20",
   },
   {
     name: "edge-router",
@@ -60,6 +73,11 @@ const topRepos = [
     readmeScore: 65,
     impactScore: 72,
     isForked: false,
+    hasPages: false,
+    isPinned: true,
+    dependencyFiles: ["package.json"],
+    createdAt: "2023-06-01",
+    pushedAt: "2024-01-08",
   },
   {
     name: "devdash",
@@ -73,6 +91,11 @@ const topRepos = [
     readmeScore: 55,
     impactScore: 61,
     isForked: false,
+    hasPages: false,
+    isPinned: false,
+    dependencyFiles: ["package.json"],
+    createdAt: "2023-10-01",
+    pushedAt: "2023-12-29",
   },
   {
     name: "gopher-cache",
@@ -86,6 +109,11 @@ const topRepos = [
     readmeScore: 45,
     impactScore: 54,
     isForked: false,
+    hasPages: false,
+    isPinned: false,
+    dependencyFiles: ["go.mod"],
+    createdAt: "2023-09-01",
+    pushedAt: "2023-10-14",
   },
 ];
 
@@ -126,10 +154,12 @@ const scoreBreakdown = computeScoreBreakdown(
   profile, topRepos, languageStats, weeklyCommits, streakDays, heatmap
 );
 
-const careerAlignment = computeCareerAlignment(languageStats, topRepos);
+const careerAlignment = computeCareerAlignment(languageStats, topRepos as any);
 const skillRadar = computeSkillRadar(scoreBreakdown);
-const archetype = classifyArchetype(languageStats, topRepos);
-const recommendations = generateRecommendations(topRepos, languageStats, weeklyCommits, scoreBreakdown);
+const archetype = classifyArchetype(languageStats, topRepos as any);
+const completeness = computeProfileCompleteness(profile, topRepos as any);
+const redFlags = detectRedFlags(profile, topRepos as any);
+const recommendations = generateRecommendations(topRepos as any, languageStats, weeklyCommits, scoreBreakdown, topRepos as any, completeness, redFlags);
 
 // ─── Export ───────────────────────────────────────────────────
 
@@ -149,6 +179,8 @@ export const MOCK_DATA: AnalysisResult = {
   totalCommitsYear: 847,
   mostProductiveMonth: "January",
   contributionHeatmap: heatmap,
+  redFlags,
+  completeness,
 };
 
 function generateHeatmap() {

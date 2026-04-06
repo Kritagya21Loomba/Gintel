@@ -5,6 +5,9 @@ import {
   computeSkillRadar,
   classifyArchetype,
   generateRecommendations,
+  detectRedFlags,
+  computeProfileCompleteness,
+  scoreRepoQuality
 } from "./scoring-engine";
 
 // ─── GitHub API Fetchers ──────────────────────────────────────
@@ -36,6 +39,7 @@ export async function fetchGitHubProfile(token: string): Promise<GitHubProfile> 
     company: user.company,
     location: user.location,
     blog: user.blog,
+    twitterUsername: user.twitter_username || null,
     createdAt: user.created_at?.split("T")[0] || "",
   };
 }
@@ -55,12 +59,17 @@ export async function fetchUserRepos(token: string): Promise<Repository[]> {
     language: r.language,
     topics: r.topics || [],
     updatedAt: r.updated_at?.split("T")[0] || "",
+    createdAt: r.created_at?.split("T")[0] || "",
+    pushedAt: r.pushed_at?.split("T")[0] || "",
     url: r.html_url,
     // Estimate README score based on heuristics (description length, topics, etc.)
     readmeScore: estimateReadmeScore(r),
     // Impact = log-scaled combination of stars, forks, and watchers
     impactScore: estimateImpactScore(r),
     isForked: r.fork,
+    hasPages: r.has_pages || false,
+    isPinned: false, // Calculated later
+    dependencyFiles: [], // Scanned for top repos later
   }));
 }
 
@@ -209,14 +218,88 @@ function generateHeatmapFromEvents(events: any[]): HeatmapDay[] {
     }));
 }
 
+async function fetchPinnedReposGraphQL(token: string, username: string): Promise<Set<string>> {
+  const query = `
+    query {
+      user(login: "${username}") {
+        pinnedItems(first: 6, types: REPOSITORY) {
+          nodes {
+            ... on Repository {
+              name
+            }
+          }
+        }
+      }
+    }
+  `;
+  try {
+    const res = await fetch("https://api.github.com/graphql", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ query }),
+    });
+    if (!res.ok) return new Set();
+    const data = await res.json();
+    const pinned = data.data?.user?.pinnedItems?.nodes || [];
+    return new Set((pinned as any[]).map((p: any) => p.name));
+  } catch (err) {
+    return new Set();
+  }
+}
+
+async function fetchRepoDependenciesSafe(token: string, repoUrl: string): Promise<string[]> {
+  try {
+    const repoPath = repoUrl.split("github.com/")[1];
+    const res = await fetch(`${GITHUB_API}/repos/${repoPath}/contents`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: "application/vnd.github+json",
+      },
+    });
+    if (!res.ok) return [];
+    
+    // Some repos might be huge or empty
+    const contents = await res.json();
+    if (!Array.isArray(contents)) return [];
+    
+    const TARGET_FILES = ["package.json", "requirements.txt", "Dockerfile", "docker-compose.yml", "go.mod", "Cargo.toml", "pom.xml", "build.gradle", "gemfile", "Makefile"];
+    const found = contents.filter(f => TARGET_FILES.some(t => f.name.toLowerCase() === t.toLowerCase())).map(f => f.name);
+    return found;
+  } catch (err) {
+    return [];
+  }
+}
+
+
 // ─── Full Analysis Pipeline ───────────────────────────────────
 
 export async function fetchFullAnalysis(token: string): Promise<AnalysisResult> {
   // Step 1: Fetch profile and repos in parallel
-  const [profile, repos] = await Promise.all([
+  const [profile, reposRaw] = await Promise.all([
     fetchGitHubProfile(token),
     fetchUserRepos(token),
   ]);
+
+  // Step 1.5: Fetch pinned repos and Top 5 repo dependencies
+  const topOriginals = reposRaw.filter(r => !r.isForked).slice(0, 5);
+  const [pinnedSet, topDependencies] = await Promise.all([
+    fetchPinnedReposGraphQL(token, profile.username),
+    Promise.all(topOriginals.map(r => fetchRepoDependenciesSafe(token, r.url).then(deps => ({ name: r.name, deps }))))
+  ]);
+
+  const dependencyMap = new Map(topDependencies.map(d => [d.name, d.deps]));
+
+  const repos = reposRaw.map(r => {
+    const isPinnedFallback = topOriginals.some(topR => topR.name === r.name);
+    return {
+      ...r,
+      isPinned: pinnedSet.size > 0 ? pinnedSet.has(r.name) : isPinnedFallback,
+      dependencyFiles: dependencyMap.get(r.name) || [],
+    };
+  });
 
   // Step 2: Fetch language stats and commit activity in parallel
   const [languageStats, weeklyCommits] = await Promise.all([
@@ -243,10 +326,17 @@ export async function fetchFullAnalysis(token: string): Promise<AnalysisResult> 
     calculateStreak(heatmap), heatmap
   );
 
+  const redFlags = detectRedFlags(profile, repos);
+  const completeness = computeProfileCompleteness(profile, repos);
+  
+  repos.forEach(r => {
+    r.qualityCard = scoreRepoQuality(r, weeklyCommits);
+  });
+
   const careerAlignment = computeCareerAlignment(languageStats, repos);
   const skillRadar = computeSkillRadar(scoreBreakdown);
   const archetype = classifyArchetype(languageStats, repos);
-  const recommendations = generateRecommendations(topRepos, languageStats, weeklyCommits, scoreBreakdown);
+  const recommendations = generateRecommendations(topRepos, languageStats, weeklyCommits, scoreBreakdown, repos, completeness, redFlags);
 
   // Find most productive month
   const monthCounts: Record<string, number> = {};
@@ -274,6 +364,8 @@ export async function fetchFullAnalysis(token: string): Promise<AnalysisResult> 
     totalCommitsYear: heatmap.reduce((s, d) => s + d.count, 0),
     mostProductiveMonth,
     contributionHeatmap: heatmap,
+    redFlags,
+    completeness,
   };
 }
 
