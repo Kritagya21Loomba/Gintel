@@ -246,24 +246,19 @@ function ArchetypeCard({ arch, rank }: { arch: ArchetypeScore; rank: number }) {
 
 function LevelBadge({
   level,
-  score,
   color,
-  size = "sm",
 }: {
   level: number;
   score: number;
   color: string;
-  size?: "sm" | "lg";
+  size?: "sm" | "lg"; // kept for API compat, no longer used
 }) {
-  const iconSize = size === "lg" ? 13 : 10;
-  const baseClass = size === "lg"
-    ? "flex items-center gap-1.5 px-2.5 py-1.5 rounded-md font-mono font-bold uppercase tracking-wider text-[11px]"
-    : "flex items-center gap-1 px-2 py-0.5 rounded-md font-mono font-bold uppercase tracking-wider text-[9px]";
+  const baseClass = "flex items-center gap-1.5 px-2 py-0.5 rounded-md font-mono font-bold uppercase tracking-wider text-[10px] border";
 
   if (level === 3) {
     return (
-      <div className={`${baseClass} bg-amber/10 text-amber border border-amber/25`}>
-        <Trophy size={iconSize} fill="currentColor" />
+      <div className={`${baseClass} bg-amber/10 text-amber border-amber/25`}>
+        <Trophy size={11} fill="currentColor" />
         <span>Lvl 3 Master</span>
       </div>
     );
@@ -271,8 +266,8 @@ function LevelBadge({
 
   if (level === 2) {
     return (
-      <div className={`${baseClass} bg-[#a78bfa]/10 text-[#a78bfa] border border-[#a78bfa]/25`}>
-        <Sparkles size={iconSize} />
+      <div className={`${baseClass} bg-[#a78bfa]/10 text-[#a78bfa] border-[#a78bfa]/25`}>
+        <Sparkles size={11} />
         <span>Lvl 2 Pro</span>
       </div>
     );
@@ -285,11 +280,9 @@ function LevelBadge({
         background: color + "15",
         color: color,
         borderColor: color + "30",
-        borderWidth: 1,
-        borderStyle: "solid",
       }}
     >
-      <ShieldCheck size={iconSize} />
+      <ShieldCheck size={11} />
       <span>Lvl 1 Basic</span>
     </div>
   );
