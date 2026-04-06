@@ -156,7 +156,7 @@ const scoreBreakdown = computeScoreBreakdown(
 
 const careerAlignment = computeCareerAlignment(languageStats, topRepos as any);
 const skillRadar = computeSkillRadar(scoreBreakdown);
-const archetype = classifyArchetype(languageStats, topRepos as any);
+const archetypes = classifyArchetype(languageStats, topRepos as any);
 const completeness = computeProfileCompleteness(profile, topRepos as any);
 const redFlags = detectRedFlags(profile, topRepos as any);
 const recommendations = generateRecommendations(topRepos as any, languageStats, weeklyCommits, scoreBreakdown, topRepos as any, completeness, redFlags);
@@ -167,8 +167,7 @@ export const MOCK_DATA: AnalysisResult = {
   profile,
   portfolioScore: scoreBreakdown.total,
   scoreBreakdown,
-  archetype: archetype.name,
-  archetypeDescription: archetype.description,
+  archetypes,
   languageStats,
   weeklyCommits,
   topRepos,

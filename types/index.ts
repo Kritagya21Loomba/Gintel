@@ -76,12 +76,19 @@ export interface CompletenessScore {
   checks: { label: string; passed: boolean }[];
 }
 
+export interface ArchetypeScore {
+  name: string;
+  description: string;
+  score: number; // 0-100 confidence
+  level: number; // 0 (locked), 1, 2, 3
+  hint: string;
+}
+
 export interface AnalysisResult {
   profile: GitHubProfile;
   portfolioScore: number;
   scoreBreakdown: ScoreBreakdown;
-  archetype: string;
-  archetypeDescription: string;
+  archetypes: ArchetypeScore[];
   languageStats: LanguageStat[];
   weeklyCommits: WeeklyCommit[];
   topRepos: Repository[];

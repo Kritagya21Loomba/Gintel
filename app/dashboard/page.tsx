@@ -27,7 +27,8 @@ import { ProSection } from "@/components/pro/ProSection";
 import { CVInsights } from "@/components/dashboard/CVInsights";
 import { StarGatePrompt } from "@/components/ui/StarGatePrompt";
 import { HistoryPanel } from "@/components/dashboard/HistoryPanel";
-
+import { ArchetypeGallery } from "@/components/dashboard/ArchetypeGallery";
+import { AchievementModal, type UnlockEvent } from "@/components/dashboard/AchievementModal";
 export default function DashboardPage() {
   return (
     <Suspense
@@ -52,9 +53,49 @@ function DashboardContent() {
   const [error, setError] = useState<string | null>(null);
   const [methodologyOpen, setMethodologyOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<TabId>("overview");
+  const [unlockEvents, setUnlockEvents] = useState<UnlockEvent[]>([]);
   
   const [hasStarredCV, setHasStarredCV] = useState<boolean | null>(null);
   const [verifyingStar, setVerifyingStar] = useState(false);
+
+  // Monitor analysis completion to trigger Archetype level-up animations
+  useEffect(() => {
+    if (!data) return;
+    
+    // We scope by username to isolate Live and Demo environments
+    const cacheKey = `gintel_dex_${data.profile.username}`;
+    let previousDex: Record<string, number> = {};
+    
+    try {
+      const cached = localStorage.getItem(cacheKey);
+      if (cached) previousDex = JSON.parse(cached);
+    } catch (e) {}
+
+    const events: UnlockEvent[] = [];
+    const newDex: Record<string, number> = { ...previousDex };
+    let hasChanges = false;
+
+    data.archetypes.forEach(arch => {
+      const currentLevel = arch.level;
+      if (currentLevel > 0) {
+        const prevLevel = previousDex[arch.name] || 0;
+        if (currentLevel > prevLevel) {
+          events.push({
+            type: prevLevel === 0 ? "NEW_UNLOCK" : "LEVEL_UP",
+            archetype: arch,
+            previousLevel: prevLevel > 0 ? prevLevel : undefined
+          });
+          newDex[arch.name] = currentLevel;
+          hasChanges = true;
+        }
+      }
+    });
+
+    if (hasChanges) {
+      localStorage.setItem(cacheKey, JSON.stringify(newDex));
+      if (events.length > 0) setUnlockEvents(events);
+    }
+  }, [data]);
 
   const verifyStar = async (quiet = false) => {
     if (!quiet) setVerifyingStar(true);
@@ -137,6 +178,13 @@ function DashboardContent() {
 
   return (
     <div className="min-h-screen bg-bg scanlines noise">
+      {unlockEvents.length > 0 && (
+        <AchievementModal 
+          events={unlockEvents} 
+          onClose={() => setUnlockEvents([])} 
+        />
+      )}
+
       <DashboardNav isLive={mode === "live"} />
 
       <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8" id="dashboard-main">
@@ -305,6 +353,10 @@ function DashboardContent() {
                 </div>
               </SectionCard>
             </>
+          )}
+
+          {activeTab === "archetypes" && (
+            <ArchetypeGallery archetypes={data.archetypes} />
           )}
 
           {activeTab === "repositories" && (

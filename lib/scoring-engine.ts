@@ -69,67 +69,159 @@ const ARCHETYPES = [
   {
     name: "Full-Stack Engineer",
     description: "You span both frontend and backend with strong JavaScript/TypeScript signals. Your projects show a pattern of shipping end-to-end — from UI to API to deployment.",
+    hint: "Push full-stack applications with both React/Vue and Node/API integrations.",
     test: (langs: LanguageStat[], topics: string[]) => {
       const tsJs = sumLangPercent(langs, ["TypeScript", "JavaScript"]);
-      const hasFront = topics.some(t => ["react", "vue", "svelte", "nextjs", "frontend", "css", "ui"].includes(t));
-      const hasBack = topics.some(t => ["api", "backend", "database", "server", "prisma", "graphql"].includes(t));
-      return tsJs > 30 && hasFront && hasBack ? tsJs * 1.2 : 0;
+      const hasFront = topics.filter(t => ["react", "vue", "svelte", "nextjs", "frontend", "css", "ui"].includes(t)).length;
+      const hasBack = topics.filter(t => ["api", "backend", "database", "server", "prisma", "graphql"].includes(t)).length;
+      const val = tsJs * 0.6 + hasFront * 15 + hasBack * 15;
+      return clamp(val, 0, 100);
     },
   },
   {
     name: "Backend Engineer",
     description: "Your codebase leans heavily server-side — APIs, data stores, and infrastructure. You build the systems that other systems depend on.",
+    hint: "Work with server languages (Go, Java, Python, Rust, C++) and microservice topics.",
     test: (langs: LanguageStat[], topics: string[]) => {
-      const backLangs = sumLangPercent(langs, ["Go", "Python", "Java", "Rust", "C++"]);
+      const backLangs = sumLangPercent(langs, ["Go", "Python", "Java", "Rust", "C++", "C#"]);
       const hasBack = topics.filter(t => ["api", "backend", "server", "cache", "redis", "grpc", "microservices", "queue"].includes(t)).length;
-      return backLangs > 40 && hasBack >= 1 ? backLangs + hasBack * 5 : 0;
+      return clamp(backLangs * 0.7 + hasBack * 20, 0, 100);
     },
   },
   {
     name: "Frontend Engineer",
     description: "You're visually driven — React, CSS, component libraries, and pixel-perfect UIs. Your GitHub screams interactive experiences.",
+    hint: "Build web UIs heavily utilizing CSS, React, Vue, HTML, and design systems.",
     test: (langs: LanguageStat[], topics: string[]) => {
-      const frontLangs = sumLangPercent(langs, ["TypeScript", "JavaScript", "CSS"]);
-      const hasFront = topics.filter(t => ["react", "vue", "svelte", "css", "ui", "design-system", "animation", "component", "frontend"].includes(t)).length;
-      const noBack = !topics.some(t => ["api", "backend", "server", "database"].includes(t));
-      return frontLangs > 50 && hasFront >= 2 && noBack ? frontLangs + hasFront * 8 : 0;
+      const frontLangs = sumLangPercent(langs, ["TypeScript", "JavaScript", "CSS", "HTML", "Sass"]);
+      const hasFront = topics.filter(t => ["react", "vue", "svelte", "css", "ui", "design-system", "animation", "component", "frontend", "tailwind"].includes(t)).length;
+      const noBackMult = topics.some(t => ["api", "backend", "database"].includes(t)) ? 0.6 : 1;
+      return clamp((frontLangs * 0.6 + hasFront * 25) * noBackMult, 0, 100);
     },
   },
   {
     name: "ML Engineer",
     description: "Python-dominant with clear machine learning signals — model training, data pipelines, and scientific computing. Your repos tell an experimentation story.",
+    hint: "Showcase Python projects mapping to PyTorch, TensorFlow, NLP, or data science.",
     test: (langs: LanguageStat[], topics: string[]) => {
-      const py = sumLangPercent(langs, ["Python", "R", "Julia"]);
+      const py = sumLangPercent(langs, ["Python", "R", "Julia", "Jupyter Notebook"]);
       const hasML = topics.filter(t => ["machine-learning", "ml", "deep-learning", "pytorch", "tensorflow", "sklearn", "pandas", "ai", "nlp", "data-science"].includes(t)).length;
-      return py > 30 && hasML >= 1 ? py + hasML * 10 : 0;
+      return clamp(py * 0.5 + hasML * 25, 0, 100);
     },
   },
   {
     name: "DevOps Engineer",
     description: "Infrastructure-as-code, containers, and deployment pipelines. You're the person who makes sure everything actually runs in production.",
+    hint: "Automate CI/CD pipelines with Docker, Kubernetes, Terraform, and Shell scripting.",
     test: (langs: LanguageStat[], topics: string[]) => {
-      const devopsTopics = topics.filter(t => ["docker", "kubernetes", "terraform", "ci-cd", "aws", "gcp", "azure", "devops", "infrastructure", "helm"].includes(t)).length;
-      const hasShell = sumLangPercent(langs, ["Shell", "HCL", "Dockerfile"]);
-      return devopsTopics >= 2 ? devopsTopics * 15 + hasShell : 0;
+      const devopsTopics = topics.filter(t => ["docker", "kubernetes", "terraform", "ci-cd", "aws", "gcp", "azure", "devops", "infrastructure", "helm", "ansible"].includes(t)).length;
+      const hasShell = sumLangPercent(langs, ["Shell", "HCL", "Dockerfile", "Makefile"]);
+      return clamp(devopsTopics * 25 + hasShell * 1.5, 0, 100);
+    },
+  },
+  {
+    name: "Mobile Developer",
+    description: "Specialized in native or cross-platform mobile experiences. Pocket-sized powerhouses.",
+    hint: "Push apps targeting Swift, Kotlin, Flutter, React Native, or mobile topics.",
+    test: (langs: LanguageStat[], topics: string[]) => {
+      const mobileLangs = sumLangPercent(langs, ["Swift", "Kotlin", "Dart", "Objective-C"]);
+      const mobileTopics = topics.filter(t => ["ios", "android", "flutter", "react-native", "mobile", "app"].includes(t)).length;
+      const tsJs = sumLangPercent(langs, ["TypeScript", "JavaScript"]);
+      const rnBonus = mobileTopics > 0 ? tsJs * 0.3 : 0;
+      return clamp(mobileLangs * 1.2 + mobileTopics * 30 + rnBonus, 0, 100);
+    },
+  },
+  {
+    name: "Game Developer",
+    description: "Interactive real-time systems, shaders, state machines, and game engine footprints.",
+    hint: "Build projects in C++ or C# tagging Unity, Unreal Engine, Godot, or game-dev.",
+    test: (langs: LanguageStat[], topics: string[]) => {
+      const gameLangs = sumLangPercent(langs, ["C#", "C++", "Lua", "HLSL", "GLSL", "GDScript"]);
+      const gameTopics = topics.filter(t => ["game", "unity", "unreal", "godot", "opengl", "vulkan", "gamedev", "rendering"].includes(t)).length;
+      return clamp(gameLangs * 0.8 + gameTopics * 35, 0, 100);
+    },
+  },
+  {
+    name: "Data Engineer",
+    description: "Data pipelines, massive scale ETLs, and analytics engineering. You manage the flow of information.",
+    hint: "Showcase SQL, Airflow, Spark, or data pipeline architecture topics.",
+    test: (langs: LanguageStat[], topics: string[]) => {
+      const dataLangs = sumLangPercent(langs, ["SQL", "Python", "Scala", "Java"]);
+      const dataTopics = topics.filter(t => ["etl", "pipeline", "spark", "hadoop", "airflow", "big-data", "analytics", "dbt", "data-engineering"].includes(t)).length;
+      return clamp(dataLangs * 0.4 + dataTopics * 35, 0, 100);
+    },
+  },
+  {
+    name: "Security Engineer",
+    description: "Low-level system analysis, vulnerability chaining, cryptography, and penetration testing payloads.",
+    hint: "Push code featuring C, Assembly, CVE research, infosec, or exploit testing.",
+    test: (langs: LanguageStat[], topics: string[]) => {
+      const secLangs = sumLangPercent(langs, ["C", "Assembly", "Python", "Shell"]);
+      const secTopics = topics.filter(t => ["security", "cve", "exploit", "crypto", "hacking", "pwn", "infosec", "reverse-engineering", "malware", "fuzzing"].includes(t)).length;
+      return clamp(secLangs * 0.3 + secTopics * 35, 0, 100);
+    },
+  },
+  {
+    name: "Web3 Engineer",
+    description: "Smart contracts, decentralized finance, and distributed ledger technology. Building the next web.",
+    hint: "Use Solidity, Rust, or Vyper tagging DeFi, Ethereum, or Web3 networks.",
+    test: (langs: LanguageStat[], topics: string[]) => {
+      const web3Langs = sumLangPercent(langs, ["Solidity", "Rust", "Vyper", "TypeScript"]);
+      const web3Topics = topics.filter(t => ["web3", "ethereum", "solana", "crypto", "defi", "smart-contracts", "nft", "blockchain", "dapp"].includes(t)).length;
+      return clamp(web3Langs * 0.3 + web3Topics * 35, 0, 100);
+    },
+  },
+  {
+    name: "Embedded Systems",
+    description: "Code that runs on bare metal. RTOS, microcontrollers, and hardware interfaces.",
+    hint: "Work with C, Assembly, Rust, Arduino, or IoT hardware topics.",
+    test: (langs: LanguageStat[], topics: string[]) => {
+      const embedLangs = sumLangPercent(langs, ["C", "C++", "Assembly", "Rust"]);
+      const embedTopics = topics.filter(t => ["embedded", "iot", "arduino", "raspberry-pi", "hardware", "rtos", "microcontroller"].includes(t)).length;
+      return clamp(embedLangs * 0.7 + embedTopics * 40, 0, 100);
+    },
+  },
+  {
+    name: "Cloud Architect",
+    description: "Distributed systems, serverless paradigms, and massive cloud infrastructure deployments.",
+    hint: "Deploy serverless architectures tagging AWS, Azure, GCP, or cloud-native concepts.",
+    test: (langs: LanguageStat[], topics: string[]) => {
+      const cloudLangs = sumLangPercent(langs, ["Go", "Python", "TypeScript", "HCL"]);
+      const cloudTopics = topics.filter(t => ["serverless", "aws", "azure", "gcp", "lambda", "cloud-native", "distributed-systems", "microservices"].includes(t)).length;
+      return clamp(cloudLangs * 0.3 + cloudTopics * 35, 0, 100);
+    },
+  },
+  {
+    name: "Technical Writer",
+    description: "Extensive documentation, static site generators, and educational deep-dives. You make code approachable.",
+    hint: "Produce heavy documentation targeting Markdown, MDX, Docusaurus, or guides.",
+    test: (langs: LanguageStat[], topics: string[]) => {
+      const docsLangs = sumLangPercent(langs, ["Markdown", "MDX", "Asciidoc", "HTML"]);
+      const docsTopics = topics.filter(t => ["docs", "documentation", "docusaurus", "guide", "tutorial", "eleventy"].includes(t)).length;
+      return clamp(docsLangs * 1.5 + docsTopics * 30, 0, 100);
     },
   },
   {
     name: "Open Source Maintainer",
     description: "High star counts, active fork communities, and consistent maintenance patterns. You don't just build — you cultivate ecosystems.",
+    hint: "Attract a high ratio of Stars to Forks across your collective portfolio.",
     test: (_langs: LanguageStat[], _topics: string[], repos?: Repository[]) => {
-      if (!repos) return 0;
+      if (!repos || repos.length === 0) return 0;
       const totalStars = repos.reduce((s, r) => s + r.stars, 0);
       const avgForkRatio = repos.reduce((s, r) => s + (r.stars > 0 ? r.forks / r.stars : 0), 0) / repos.length;
-      return totalStars > 500 && avgForkRatio > 0.05 ? Math.log10(totalStars) * 20 + avgForkRatio * 100 : 0;
+      const starScale = Math.min(Math.log10(totalStars + 1) * 20, 60); // 1000 stars -> ~60 points
+      const forkScale = Math.min(avgForkRatio * 300, 40); // 0.1 ratio -> 30 points
+      return clamp(starScale + forkScale, 0, 100);
     },
   },
   {
     name: "Research Engineer",
     description: "Low-visibility but deeply technical repos — algorithm implementations, formal proofs, and academic-adjacent code. Quality over popularity.",
+    hint: "Publish algorithmic simulations, math papers, or highly complex but niche repos.",
     test: (langs: LanguageStat[], topics: string[], repos?: Repository[]) => {
-      const researchTopics = topics.filter(t => ["research", "algorithm", "paper", "math", "compiler", "simulation", "proof"].includes(t)).length;
-      const hasDepth = repos ? repos.some(r => r.impactScore > 70 && r.stars < 50) : false;
-      return researchTopics >= 1 || hasDepth ? researchTopics * 15 + (hasDepth ? 30 : 0) : 0;
+      const researchTopics = topics.filter(t => ["research", "algorithm", "paper", "math", "compiler", "simulation", "proof", "science"].includes(t)).length;
+      const hasDepth = repos ? repos.filter(r => r.impactScore > 70 && r.stars < 50).length : 0;
+      return clamp(researchTopics * 25 + hasDepth * 20, 0, 100);
     },
   },
 ];
@@ -459,19 +551,26 @@ export function computeSkillRadar(breakdown: ScoreBreakdown): SkillRadarPoint[] 
 export function classifyArchetype(
   langs: LanguageStat[],
   repos: Repository[]
-): { name: string; description: string } {
+): import("@/types").ArchetypeScore[] {
   const allTopics = repos.flatMap((r) => r.topics.map((t) => t.toLowerCase()));
 
-  let best = { name: "Full-Stack Engineer", description: ARCHETYPES[0].description, score: 0 };
+  const scores = ARCHETYPES.map(archetype => {
+    const rawScore = Math.floor(archetype.test(langs, allTopics, repos));
+    let level = 0;
+    if (rawScore >= 85) level = 3;
+    else if (rawScore >= 60) level = 2;
+    else if (rawScore >= 30) level = 1;
 
-  for (const archetype of ARCHETYPES) {
-    const score = archetype.test(langs, allTopics, repos);
-    if (score > best.score) {
-      best = { name: archetype.name, description: archetype.description, score };
-    }
-  }
+    return {
+      name: archetype.name,
+      description: archetype.description,
+      hint: archetype.hint,
+      score: rawScore,
+      level,
+    };
+  });
 
-  return { name: best.name, description: best.description };
+  return scores.sort((a, b) => b.score - a.score);
 }
 
 // ─── Recommendation Engine ────────────────────────────────────

@@ -335,7 +335,7 @@ export async function fetchFullAnalysis(token: string): Promise<AnalysisResult> 
 
   const careerAlignment = computeCareerAlignment(languageStats, repos);
   const skillRadar = computeSkillRadar(scoreBreakdown);
-  const archetype = classifyArchetype(languageStats, repos);
+  const archetypes = classifyArchetype(languageStats, repos);
   const recommendations = generateRecommendations(topRepos, languageStats, weeklyCommits, scoreBreakdown, repos, completeness, redFlags);
 
   // Find most productive month
@@ -348,15 +348,14 @@ export async function fetchFullAnalysis(token: string): Promise<AnalysisResult> 
   }
   const mostProductiveMonth = Object.entries(monthCounts).sort(([,a], [,b]) => b - a)[0]?.[0] || "N/A";
 
-  return {
+  const result: AnalysisResult = {
     profile,
     portfolioScore: scoreBreakdown.total,
     scoreBreakdown,
-    archetype: archetype.name,
-    archetypeDescription: archetype.description,
+    archetypes,
     languageStats,
     weeklyCommits,
-    topRepos,
+    topRepos: repos.slice(0, 6),
     careerAlignment,
     skillRadar,
     recommendations,
@@ -367,6 +366,8 @@ export async function fetchFullAnalysis(token: string): Promise<AnalysisResult> 
     redFlags,
     completeness,
   };
+
+  return result;
 }
 
 function calculateStreak(heatmap: HeatmapDay[]): number {

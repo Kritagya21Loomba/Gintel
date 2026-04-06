@@ -17,7 +17,8 @@ function formatUrl(url: string): string {
 }
 
 export function DashboardHeader({ data }: DashboardHeaderProps) {
-  const { profile, portfolioScore, archetype, archetypeDescription } = data;
+  const { profile, portfolioScore, archetypes } = data;
+  const primaryArchetype = archetypes[0] || { name: "Software Engineer", description: "Standard developer profile." };
   const [exporting, setExporting] = useState(false);
 
   async function handleExport() {
@@ -139,18 +140,18 @@ export function DashboardHeader({ data }: DashboardHeaderProps) {
           <div className="hidden md:block w-px h-20 bg-border" />
 
           <div className="hidden md:block max-w-[180px]">
-            <div className="font-mono text-[10px] text-muted tracking-widest mb-1">ARCHETYPE</div>
-            <div className="font-display font-bold text-base text-accent mb-2">{archetype}</div>
-            <p className="font-body text-xs text-text-dim leading-relaxed">{archetypeDescription}</p>
+            <div className="font-mono text-[10px] text-muted tracking-widest mb-1">PRIMARY ARCHETYPE</div>
+            <div className="font-display font-bold text-base text-accent mb-2">{primaryArchetype.name}</div>
+            <p className="font-body text-xs text-text-dim leading-relaxed">{primaryArchetype.description}</p>
           </div>
         </div>
       </div>
 
       {/* Mobile archetype */}
       <div className="md:hidden mt-4 pt-4 border-t border-border/50">
-        <div className="font-mono text-[10px] text-muted tracking-widest mb-1">ARCHETYPE</div>
-        <div className="font-display font-bold text-base text-accent mb-1">{archetype}</div>
-        <p className="font-body text-xs text-text-dim leading-relaxed">{archetypeDescription}</p>
+        <div className="font-mono text-[10px] text-muted tracking-widest mb-1">PRIMARY ARCHETYPE</div>
+        <div className="font-display font-bold text-base text-accent mb-1">{primaryArchetype.name}</div>
+        <p className="font-body text-xs text-text-dim leading-relaxed">{primaryArchetype.description}</p>
       </div>
 
       {/* Export bar */}

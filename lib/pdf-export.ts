@@ -162,9 +162,9 @@ export async function exportDashboardPDF(username: string, data?: AnalysisResult
   drawText("/100", scoreX + 28, py + 6, 10, C.muted, "normal");
   drawText("PORTFOLIO SCORE", scoreX, py + 13, 6, C.muted, "normal");
 
-  // Archetype
-  drawText(data.archetype, scoreX, py + 22, 9, C.accent, "bold");
-  drawText("ARCHETYPE", scoreX, py + 27, 6, C.muted, "normal");
+  const primaryArchetype = data.archetypes && data.archetypes.length > 0 ? data.archetypes[0].name : "Software Engineer";
+  drawText(primaryArchetype, scoreX, py + 22, 9, C.accent, "bold");
+  drawText("PRIMARY ARCHETYPE", scoreX, py + 27, 5, C.muted, "normal");
 
   y += 44;
 
