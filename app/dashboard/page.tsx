@@ -24,6 +24,8 @@ import { RedFlags } from "@/components/ui/RedFlags";
 import { ProfileCompleteness } from "@/components/ui/ProfileCompleteness";
 import { Loader2, ChevronDown, ChevronRight } from "lucide-react";
 import { ProSection } from "@/components/pro/ProSection";
+import { CVInsights } from "@/components/dashboard/CVInsights";
+import { StarGatePrompt } from "@/components/ui/StarGatePrompt";
 
 export default function DashboardPage() {
   return (
@@ -49,6 +51,33 @@ function DashboardContent() {
   const [error, setError] = useState<string | null>(null);
   const [methodologyOpen, setMethodologyOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<TabId>("overview");
+  
+  const [hasStarredCV, setHasStarredCV] = useState<boolean | null>(null);
+  const [verifyingStar, setVerifyingStar] = useState(false);
+
+  const verifyStar = async () => {
+    setVerifyingStar(true);
+    try {
+      const res = await fetch("/api/github/check-star");
+      if (res.ok) {
+        const d = await res.json();
+        setHasStarredCV(d.hasStarred);
+      } else {
+        setHasStarredCV(false);
+      }
+    } catch (e) {
+      setHasStarredCV(false);
+    }
+    setVerifyingStar(false);
+  };
+
+  useEffect(() => {
+    if (activeTab === "cv-insights" && hasStarredCV === null && mode === "live") {
+      verifyStar();
+    } else if (mode === "mock") {
+      setHasStarredCV(true); // Auto bypass for mock mode
+    }
+  }, [activeTab, hasStarredCV, mode]);
 
   useEffect(() => {
     async function loadData() {
@@ -345,6 +374,23 @@ function DashboardContent() {
               {/* ─── PRO INSIGHTS ────────────────────────────────── */}
               <ProSection analysis={data} />
             </>
+          )}
+
+          {activeTab === "cv-insights" && (
+            <div className="relative">
+              {hasStarredCV === false ? (
+                <div className="relative">
+                  <div className="pointer-events-none blur-sm opacity-50 select-none">
+                    <CVInsights />
+                  </div>
+                  <div className="absolute inset-0 z-20 flex items-center justify-center p-4">
+                    <StarGatePrompt onVerify={verifyStar} isLoading={verifyingStar} />
+                  </div>
+                </div>
+              ) : (
+                <CVInsights />
+              )}
+            </div>
           )}
         </div>
 

@@ -1,6 +1,6 @@
 import clsx from "clsx";
 
-export type TabId = "overview" | "repositories" | "recommendations" | "pro";
+export type TabId = "overview" | "repositories" | "recommendations" | "pro" | "cv-insights";
 
 interface DashboardTabsProps {
   activeTab: TabId;
@@ -12,6 +12,7 @@ const TABS: { id: TabId; label: string }[] = [
   { id: "repositories", label: "Repositories" },
   { id: "recommendations", label: "Recommendations" },
   { id: "pro", label: "Insights" },
+  { id: "cv-insights", label: "CV Insights 🔒" },
 ];
 
 export function DashboardTabs({ activeTab, onChange }: DashboardTabsProps) {
