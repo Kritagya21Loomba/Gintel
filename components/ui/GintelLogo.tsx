@@ -7,53 +7,46 @@ interface GintelLogoProps {
   className?: string;
 }
 
+// The mark: a clean geometric "G" — two concentric arcs (outer 3/4, inner half)
+// forming a modern monogram. Smooth, refined, zero circuit-board energy.
+// Think: a compass rose collapsed into a letter. Animated on mount.
 export function GintelLogo({ size = 32, className = "" }: GintelLogoProps) {
-  // A clean "G" formed from a broken circuit ring:
-  // — outer arc that doesn't close (open at the right like a C)
-  // — a horizontal crossbar extending inward at midpoint
-  // — small node dots at the terminals
-  const s = size;
-  const cx = s / 2;
-  const cy = s / 2;
-  const r = s * 0.36;        // main arc radius
-  const sw = s * 0.075;      // stroke width
-  const gap = 28;            // degrees of arc left open at the right (top-right terminal)
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { const t = setTimeout(() => setMounted(true), 80); return () => clearTimeout(t); }, []);
 
-  // Arc: starts at gap/2 degrees from top-right, goes counter-clockwise almost full circle
-  const startDeg = -gap / 2;  // top-right opening start
-  const endDeg = gap / 2;     // top-right opening end (going the long way around)
+  const c = size / 2;
+  const R = size * 0.42;   // outer arc radius
+  const r = size * 0.26;   // inner arc radius
+  const sw = size * 0.08;  // stroke weight
 
-  const toRad = (d: number) => (d * Math.PI) / 180;
-  const px = (deg: number) => cx + r * Math.cos(toRad(deg));
-  const py = (deg: number) => cy + r * Math.sin(toRad(deg));
+  // Outer arc: 270° — open at top-right (starts at ~135° goes clockwise to ~45°)
+  const outerCirc = 2 * Math.PI * R;
+  const outerDash = outerCirc * 0.75; // 270° of 360°
+  const outerGap = outerCirc * 0.25;
 
-  // The long arc goes from startDeg, clockwise (large arc), to endDeg
-  const x1 = px(startDeg);
-  const y1 = py(startDeg);
-  const x2 = px(endDeg);
-  const y2 = py(endDeg);
+  // Inner arc: 180° — the "shelf" of the G, bottom half
+  const innerCirc = 2 * Math.PI * r;
+  const innerDash = innerCirc * 0.5;
+  const innerGap = innerCirc * 0.5;
 
-  // Crossbar: horizontal line from the 0° (right) point inward to center-right
-  const crossY = cy;                        // vertical midpoint
-  const crossX1 = cx + r;                  // outer edge (3 o'clock)
-  const crossX2 = cx + r * 0.18;           // terminates near centre
-
-  // The 3 o'clock point on the arc (where crossbar meets arc)
-  const midX = px(0);
-  const midY = py(0);
+  // Crossbar: horizontal line from inner-right edge to outer-right edge, at midpoint
+  const crossY = c;
+  const crossX1 = c + r;   // inner right
+  const crossX2 = c + R;   // outer right
 
   return (
     <svg
-      width={s}
-      height={s}
-      viewBox={`0 0 ${s} ${s}`}
+      width={size}
+      height={size}
+      viewBox={`0 0 ${size} ${size}`}
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       className={className}
+      style={{ overflow: "visible" }}
     >
       <defs>
-        <filter id="logo-glow" x="-40%" y="-40%" width="180%" height="180%">
-          <feGaussianBlur stdDeviation="1.2" result="blur" />
+        <filter id={`g-glow-${size}`} x="-60%" y="-60%" width="220%" height="220%">
+          <feGaussianBlur stdDeviation={size * 0.06} result="blur" />
           <feMerge>
             <feMergeNode in="blur" />
             <feMergeNode in="SourceGraphic" />
@@ -61,33 +54,51 @@ export function GintelLogo({ size = 32, className = "" }: GintelLogoProps) {
         </filter>
       </defs>
 
-      {/* Main arc — open at top-right, clockwise large arc */}
-      <path
-        d={`M ${x1} ${y1} A ${r} ${r} 0 1 0 ${x2} ${y2}`}
-        stroke="#00ff88"
-        strokeWidth={sw}
-        strokeLinecap="square"
-        filter="url(#logo-glow)"
-      />
+      <g filter={`url(#g-glow-${size})`}>
+        {/* Outer arc — 270°, rotated so gap is at top-right */}
+        <circle
+          cx={c} cy={c} r={R}
+          stroke="#00ff88"
+          strokeWidth={sw}
+          strokeLinecap="round"
+          strokeDasharray={`${outerDash} ${outerGap}`}
+          strokeDashoffset={mounted ? 0 : outerCirc}
+          fill="none"
+          style={{
+            transform: `rotate(135deg)`,
+            transformOrigin: `${c}px ${c}px`,
+            transition: mounted ? "stroke-dashoffset 0.7s cubic-bezier(0.4, 0, 0.2, 1)" : "none",
+          }}
+        />
 
-      {/* Crossbar — horizontal from arc's 3 o'clock inward */}
-      <line
-        x1={crossX1}
-        y1={crossY}
-        x2={crossX2}
-        y2={crossY}
-        stroke="#00ff88"
-        strokeWidth={sw}
-        strokeLinecap="square"
-        filter="url(#logo-glow)"
-      />
+        {/* Inner arc — 180°, bottom half */}
+        <circle
+          cx={c} cy={c} r={r}
+          stroke="#00ff88"
+          strokeWidth={sw}
+          strokeLinecap="round"
+          strokeDasharray={`${innerDash} ${innerGap}`}
+          strokeDashoffset={mounted ? 0 : innerCirc}
+          fill="none"
+          style={{
+            transform: `rotate(0deg)`,
+            transformOrigin: `${c}px ${c}px`,
+            transition: mounted ? "stroke-dashoffset 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.15s" : "none",
+          }}
+        />
 
-      {/* Terminal node at top opening (start) */}
-      <circle cx={x1} cy={y1} r={sw * 0.8} fill="#00ff88" opacity="0.9" />
-      {/* Terminal node at bottom opening (end) */}
-      <circle cx={x2} cy={y2} r={sw * 0.8} fill="#00ff88" opacity="0.9" />
-      {/* Terminal node at crossbar inner end */}
-      <circle cx={crossX2} cy={crossY} r={sw * 0.8} fill="#00ff88" opacity="0.9" />
+        {/* Crossbar */}
+        <line
+          x1={mounted ? crossX1 : crossX2}
+          y1={crossY}
+          x2={crossX2}
+          y2={crossY}
+          stroke="#00ff88"
+          strokeWidth={sw}
+          strokeLinecap="round"
+          style={{ transition: mounted ? "x1 0.4s cubic-bezier(0.4, 0, 0.2, 1) 0.3s" : "none" }}
+        />
+      </g>
     </svg>
   );
 }
@@ -98,116 +109,148 @@ interface LoadingScreenProps {
 }
 
 export function LoadingScreen({ onComplete }: LoadingScreenProps) {
-  const [phase, setPhase] = useState<"enter" | "pulse" | "exit">("enter");
+  const [phase, setPhase] = useState<"enter" | "draw" | "glow" | "exit">("enter");
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
-    const progressInterval = setInterval(() => {
-      setProgress(p => {
-        if (p >= 100) { clearInterval(progressInterval); return 100; }
-        return p + 2;
-      });
-    }, 25);
+    const t1 = setTimeout(() => setPhase("draw"), 100);
+    const t2 = setTimeout(() => setPhase("glow"), 900);
+    const t3 = setTimeout(() => setPhase("exit"), 1800);
+    const t4 = setTimeout(() => onComplete(), 2300);
 
-    const pulseTimer = setTimeout(() => setPhase("pulse"), 400);
-    const exitTimer = setTimeout(() => setPhase("exit"), 1600);
-    const doneTimer = setTimeout(() => onComplete(), 2100);
+    const iv = setInterval(() => {
+      setProgress(p => { if (p >= 100) { clearInterval(iv); return 100; } return p + 2; });
+    }, 28);
 
-    return () => {
-      clearInterval(progressInterval);
-      clearTimeout(pulseTimer);
-      clearTimeout(exitTimer);
-      clearTimeout(doneTimer);
-    };
+    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); clearTimeout(t4); clearInterval(iv); };
   }, [onComplete]);
+
+  // Large animated G for the loader — same mark, bigger
+  const size = 96;
+  const c = size / 2;
+  const R = size * 0.42;
+  const r = size * 0.26;
+  const sw = size * 0.075;
+  const outerCirc = 2 * Math.PI * R;
+  const outerDash = outerCirc * 0.75;
+  const outerGap = outerCirc * 0.25;
+  const innerCirc = 2 * Math.PI * r;
+  const innerDash = innerCirc * 0.5;
+  const innerGap = innerCirc * 0.5;
+  const crossX1 = c + r;
+  const crossX2 = c + R;
+  const crossY = c;
+
+  const isDrawing = phase !== "enter";
+  const isGlowing = phase === "glow" || phase === "exit";
 
   return (
     <div
-      className={`fixed inset-0 z-[9999] flex flex-col items-center justify-center transition-all duration-500 ${phase === "exit" ? "opacity-0 scale-105" : "opacity-100 scale-100"
+      className={`fixed inset-0 z-[9999] flex flex-col items-center justify-center transition-all duration-500 ${phase === "exit" ? "opacity-0 scale-[1.04]" : "opacity-100 scale-100"
         }`}
       style={{ background: "var(--bg)" }}
     >
-      {/* Subtle grid */}
-      <div
-        className="absolute inset-0 opacity-40"
-        style={{
-          backgroundImage:
-            "linear-gradient(rgba(0,255,136,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(0,255,136,0.04) 1px, transparent 1px)",
-          backgroundSize: "40px 40px",
-        }}
-      />
+      {/* Grid bg */}
+      <div className="absolute inset-0 opacity-30" style={{
+        backgroundImage: "linear-gradient(rgba(0,255,136,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(0,255,136,0.05) 1px, transparent 1px)",
+        backgroundSize: "44px 44px",
+      }} />
 
       {/* Radial ambient */}
-      <div
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[480px] h-[480px] rounded-full pointer-events-none"
-        style={{ background: "radial-gradient(ellipse, rgba(0,255,136,0.05) 0%, transparent 70%)" }}
-      />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[520px] h-[520px] rounded-full pointer-events-none" style={{
+        background: "radial-gradient(ellipse, rgba(0,255,136,0.04) 0%, transparent 70%)",
+      }} />
 
-      <div
-        className={`relative flex flex-col items-center gap-7 transition-all duration-500 ${phase === "enter" ? "opacity-0 translate-y-3" : "opacity-100 translate-y-0"
-          }`}
-      >
-        {/* Logo with slow-spin orbit ring */}
-        <div className="relative" style={{ width: 100, height: 100 }}>
-          {/* Orbit ring */}
+      <div className={`flex flex-col items-center gap-8 transition-all duration-500 ${phase === "enter" ? "opacity-0 translate-y-4" : "opacity-100 translate-y-0"
+        }`}>
+
+        {/* Mark */}
+        <div style={{ position: "relative", width: size, height: size }}>
+          {/* Slow rotating orbit ring — subtle */}
           <svg
+            width={size} height={size} viewBox={`0 0 ${size} ${size}`}
             className="absolute inset-0 animate-spin"
-            style={{ animationDuration: "4s" }}
-            width={100} height={100} viewBox="0 0 100 100"
+            style={{ animationDuration: "8s", opacity: 0.18 }}
           >
-            <circle
-              cx="50" cy="50" r="46"
-              stroke="#00ff88" strokeWidth="0.75" fill="none"
-              strokeDasharray="12 10" opacity="0.25"
-            />
+            <circle cx={c} cy={c} r={R + sw} stroke="#00ff88" strokeWidth="0.5" fill="none" strokeDasharray="4 12" />
           </svg>
 
-          {/* Logo centered */}
-          <div
-            className="absolute inset-0 flex items-center justify-center"
-            style={{
-              filter: phase === "pulse"
-                ? "drop-shadow(0 0 12px rgba(0,255,136,0.7)) drop-shadow(0 0 28px rgba(0,255,136,0.3))"
-                : "none",
-              transition: "filter 0.6s ease",
-            }}
-          >
-            <GintelLogo size={56} />
-          </div>
+          {/* The G mark */}
+          <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} fill="none" style={{ overflow: "visible" }} className="absolute inset-0">
+            <defs>
+              <filter id="loader-glow" x="-80%" y="-80%" width="260%" height="260%">
+                <feGaussianBlur stdDeviation={isGlowing ? 5 : 2} result="blur" />
+                <feMerge>
+                  <feMergeNode in="blur" />
+                  <feMergeNode in="SourceGraphic" />
+                </feMerge>
+              </filter>
+            </defs>
+            <g filter="url(#loader-glow)" style={{ transition: "filter 0.6s ease" }}>
+              <circle
+                cx={c} cy={c} r={R}
+                stroke="#00ff88" strokeWidth={sw} strokeLinecap="round" fill="none"
+                strokeDasharray={`${outerDash} ${outerGap}`}
+                strokeDashoffset={isDrawing ? 0 : outerCirc}
+                style={{
+                  transform: `rotate(135deg)`,
+                  transformOrigin: `${c}px ${c}px`,
+                  transition: "stroke-dashoffset 0.65s cubic-bezier(0.4,0,0.2,1)",
+                }}
+              />
+              <circle
+                cx={c} cy={c} r={r}
+                stroke="#00ff88" strokeWidth={sw} strokeLinecap="round" fill="none"
+                strokeDasharray={`${innerDash} ${innerGap}`}
+                strokeDashoffset={isDrawing ? 0 : innerCirc}
+                style={{
+                  transformOrigin: `${c}px ${c}px`,
+                  transition: "stroke-dashoffset 0.5s cubic-bezier(0.4,0,0.2,1) 0.2s",
+                }}
+              />
+              <line
+                x1={isDrawing ? crossX1 : crossX2} y1={crossY}
+                x2={crossX2} y2={crossY}
+                stroke="#00ff88" strokeWidth={sw} strokeLinecap="round"
+                style={{ transition: "x1 0.35s cubic-bezier(0.4,0,0.2,1) 0.4s" }}
+              />
+            </g>
+          </svg>
         </div>
 
         {/* Wordmark */}
-        <div className="flex flex-col items-center gap-1">
+        <div className="flex flex-col items-center gap-1.5">
           <span
-            className="font-mono font-bold tracking-[0.45em] text-lg"
+            className="font-mono font-bold tracking-[0.5em] text-xl"
             style={{
               color: "#00ff88",
-              textShadow: phase === "pulse" ? "0 0 18px rgba(0,255,136,0.5)" : "none",
-              transition: "text-shadow 0.6s ease",
+              textShadow: isGlowing ? "0 0 24px rgba(0,255,136,0.5), 0 0 48px rgba(0,255,136,0.2)" : "none",
+              transition: "text-shadow 0.7s ease",
             }}
           >
             GINTEL
           </span>
-          <span className="font-mono text-[10px] tracking-widest" style={{ color: "var(--muted)" }}>
-            GITHUB INTELLIGENCE LAYER
+          <span className="font-mono text-[10px] tracking-[0.3em] uppercase" style={{ color: "var(--muted)" }}>
+            Github Intelligence Layer
           </span>
         </div>
 
-        {/* Progress bar */}
-        <div className="w-40 h-px overflow-hidden rounded-full" style={{ background: "var(--border)" }}>
-          <div
-            className="h-full rounded-full transition-all duration-75"
-            style={{
-              width: `${progress}%`,
-              background: "linear-gradient(90deg, #00cc6a, #00ff88)",
-              boxShadow: "0 0 6px rgba(0,255,136,0.5)",
-            }}
-          />
+        {/* Progress */}
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-36 h-px overflow-hidden" style={{ background: "var(--border)" }}>
+            <div
+              className="h-full transition-all duration-75"
+              style={{
+                width: `${progress}%`,
+                background: "linear-gradient(90deg, #00cc6a, #00ff88)",
+                boxShadow: "0 0 8px rgba(0,255,136,0.4)",
+              }}
+            />
+          </div>
+          <span className="font-mono text-[9px] tracking-widest animate-pulse" style={{ color: "var(--muted)" }}>
+            INITIALIZING
+          </span>
         </div>
-
-        <span className="font-mono text-[10px] tracking-widest animate-pulse" style={{ color: "var(--muted)" }}>
-          INITIALIZING...
-        </span>
       </div>
     </div>
   );
