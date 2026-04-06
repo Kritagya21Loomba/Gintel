@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { createPortal } from "react-dom";
 import type { TemporalProfile } from "@/types/pro";
 import { TrendingUp, TrendingDown, Minus, AlertTriangle, Moon, Calendar } from "lucide-react";
 
@@ -38,13 +39,7 @@ export function TemporalIntelligence({ temporal }: Props) {
   });
 
   function handleCellEnter(e: React.MouseEvent, day: string, hour: number, intensity: number) {
-    // Use raw mouse viewport coords — immune to CSS transforms and scroll on parent containers
-    setTooltip({
-      visible: true,
-      x: e.clientX,
-      y: e.clientY,
-      day, hour, intensity,
-    });
+    setTooltip({ visible: true, x: e.clientX, y: e.clientY, day, hour, intensity });
   }
 
   function handleCellMove(e: React.MouseEvent) {
@@ -54,6 +49,49 @@ export function TemporalIntelligence({ temporal }: Props) {
   function handleCellLeave() {
     setTooltip(t => ({ ...t, visible: false }));
   }
+
+  const tooltipEl = tooltip.visible ? (
+    <div
+      className="pointer-events-none"
+      style={{
+        position: "fixed",
+        left: tooltip.x,
+        top: tooltip.y - 16,
+        transform: "translate(-50%, -100%)",
+        zIndex: 99999,
+      }}
+    >
+      <div
+        className="rounded-lg px-3 py-2 text-left shadow-lg"
+        style={{
+          background: "#0d1117",
+          border: "1px solid rgba(0,255,136,0.2)",
+          boxShadow: "0 4px 20px rgba(0,0,0,0.6), 0 0 12px rgba(0,255,136,0.08)",
+          minWidth: 130,
+        }}
+      >
+        <div className="font-mono text-[10px] text-accent font-bold mb-0.5">
+          {tooltip.day} · {fmt12(tooltip.hour)}
+        </div>
+        <div className="font-mono text-[11px] text-text">
+          {tooltip.intensity === 0
+            ? "No activity"
+            : `${Math.round(tooltip.intensity * 100)}% activity`}
+        </div>
+        {tooltip.intensity > 0.7 && (
+          <div className="font-mono text-[9px] text-accent/60 mt-0.5">Peak window</div>
+        )}
+      </div>
+      <div className="flex justify-center">
+        <div style={{
+          width: 0, height: 0,
+          borderLeft: "5px solid transparent",
+          borderRight: "5px solid transparent",
+          borderTop: "5px solid rgba(0,255,136,0.2)",
+        }} />
+      </div>
+    </div>
+  ) : null;
 
   return (
     <div className="space-y-5">
@@ -125,49 +163,6 @@ export function TemporalIntelligence({ temporal }: Props) {
                 </div>
               </div>
             ))}
-
-            {/* Custom tooltip — fixed + mouse-tracked, immune to scroll/transform */}
-            {tooltip.visible && (
-              <div
-                className="fixed z-[9999] pointer-events-none"
-                style={{
-                  left: tooltip.x,
-                  top: tooltip.y - 16,
-                  transform: "translate(-50%, -100%)",
-                }}
-              >
-                <div
-                  className="rounded-lg px-3 py-2 text-left shadow-lg"
-                  style={{
-                    background: "#0d1117",
-                    border: "1px solid rgba(0,255,136,0.2)",
-                    boxShadow: "0 4px 20px rgba(0,0,0,0.6), 0 0 12px rgba(0,255,136,0.08)",
-                    minWidth: 130,
-                  }}
-                >
-                  <div className="font-mono text-[10px] text-accent font-bold mb-0.5">
-                    {tooltip.day} · {fmt12(tooltip.hour)}
-                  </div>
-                  <div className="font-mono text-[11px] text-text">
-                    {tooltip.intensity === 0
-                      ? "No activity"
-                      : `${Math.round(tooltip.intensity * 100)}% activity`}
-                  </div>
-                  {tooltip.intensity > 0.7 && (
-                    <div className="font-mono text-[9px] text-accent/60 mt-0.5">Peak window</div>
-                  )}
-                </div>
-                {/* Arrow */}
-                <div className="flex justify-center">
-                  <div style={{
-                    width: 0, height: 0,
-                    borderLeft: "5px solid transparent",
-                    borderRight: "5px solid transparent",
-                    borderTop: "5px solid rgba(0,255,136,0.2)",
-                  }} />
-                </div>
-              </div>
-            )}
           </div>
         </div>
       </div>
@@ -213,6 +208,9 @@ export function TemporalIntelligence({ temporal }: Props) {
           <p key={i} className="font-mono text-[10px] text-text-dim leading-relaxed">• {s}</p>
         ))}
       </div>
+
+      {/* Tooltip portal — rendered directly into document.body to escape all transforms/overflow */}
+      {typeof document !== "undefined" && createPortal(tooltipEl, document.body)}
     </div>
   );
 }

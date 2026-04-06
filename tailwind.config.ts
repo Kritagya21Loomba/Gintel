@@ -11,7 +11,7 @@ const config: Config = {
       fontFamily: {
         mono: ["'JetBrains Mono'", "monospace"],
         display: ["'Syne'", "sans-serif"],
-        wordmark: ["'Orbitron'", "sans-serif"],
+        wordmark: ["'Plus Jakarta Sans'", "sans-serif"],
         body: ["'DM Sans'", "sans-serif"],
       },
       colors: {

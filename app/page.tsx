@@ -136,7 +136,7 @@ export default function Home() {
               <GintelLogo size={28} />
             </div>
             <div className="flex items-baseline gap-2">
-              <span className="font-mono text-sm font-bold tracking-widest" style={{ fontFamily: "'Orbitron', sans-serif", color: "var(--accent)" }}>GINTEL</span>
+              <span className="font-mono text-sm font-bold tracking-widest" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", color: "var(--accent)" }}>GINTEL</span>
               <span className="font-mono text-muted text-[10px]" style={{ color: "var(--cyan-dim)" }}>v0.2.0</span>
             </div>
           </div>

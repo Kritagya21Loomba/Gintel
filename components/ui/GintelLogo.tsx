@@ -185,10 +185,10 @@ export function LoadingScreen({ onComplete }: LoadingScreenProps) {
           {/* Big impact wordmark */}
           <span
             style={{
-              fontFamily: "'Orbitron', sans-serif",
-              fontWeight: 900,
-              fontSize: "52px",
-              letterSpacing: "0.2em",
+              fontFamily: "'Plus Jakarta Sans', sans-serif",
+              fontWeight: 800,
+              fontSize: "56px",
+              letterSpacing: "0.12em",
               lineHeight: 1,
               color: "#00ff88",
               display: "inline-block",
