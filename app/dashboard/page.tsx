@@ -22,13 +22,21 @@ import { formatNumber } from "@/lib/utils";
 import type { AnalysisResult } from "@/types";
 import { RedFlags } from "@/components/ui/RedFlags";
 import { ProfileCompleteness } from "@/components/ui/ProfileCompleteness";
-import { Loader2, ChevronDown, ChevronRight } from "lucide-react";
+import { Loader2, ChevronDown, ChevronRight, Swords, TrendingUp, Users, Tag } from "lucide-react";
 import { ProSection } from "@/components/pro/ProSection";
 import { CVInsights } from "@/components/dashboard/CVInsights";
 import { StarGatePrompt } from "@/components/ui/StarGatePrompt";
 import { HistoryPanel } from "@/components/dashboard/HistoryPanel";
 import { ArchetypeGallery } from "@/components/dashboard/ArchetypeGallery";
 import { AchievementModal, type UnlockEvent } from "@/components/dashboard/AchievementModal";
+function RoadmapIcon({ type }: { type: "swords" | "trend" | "users" | "badge" }) {
+  const cls = "text-muted mt-0.5 flex-shrink-0";
+  if (type === "swords") return <Swords size={14} className={cls} />;
+  if (type === "trend") return <TrendingUp size={14} className={cls} />;
+  if (type === "users") return <Users size={14} className={cls} />;
+  return <Tag size={14} className={cls} />;
+}
+
 export default function DashboardPage() {
   return (
     <Suspense
@@ -54,22 +62,22 @@ function DashboardContent() {
   const [methodologyOpen, setMethodologyOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<TabId>("overview");
   const [unlockEvents, setUnlockEvents] = useState<UnlockEvent[]>([]);
-  
+
   const [hasStarredCV, setHasStarredCV] = useState<boolean | null>(null);
   const [verifyingStar, setVerifyingStar] = useState(false);
 
   // Monitor analysis completion to trigger Archetype level-up animations
   useEffect(() => {
     if (!data) return;
-    
+
     // We scope by username to isolate Live and Demo environments
     const cacheKey = `gintel_dex_${data.profile.username}`;
     let previousDex: Record<string, number> = {};
-    
+
     try {
       const cached = localStorage.getItem(cacheKey);
       if (cached) previousDex = JSON.parse(cached);
-    } catch (e) {}
+    } catch (e) { }
 
     const events: UnlockEvent[] = [];
     const newDex: Record<string, number> = { ...previousDex };
@@ -179,9 +187,9 @@ function DashboardContent() {
   return (
     <div className="min-h-screen bg-bg scanlines noise">
       {unlockEvents.length > 0 && (
-        <AchievementModal 
-          events={unlockEvents} 
-          onClose={() => setUnlockEvents([])} 
+        <AchievementModal
+          events={unlockEvents}
+          onClose={() => setUnlockEvents([])}
         />
       )}
 
@@ -237,7 +245,7 @@ function DashboardContent() {
                       <span className="font-mono text-xs text-text font-bold">
                         {Math.round(
                           data.weeklyCommits.reduce((s, w) => s + w.commits, 0) /
-                            data.weeklyCommits.length
+                          data.weeklyCommits.length
                         )}
                       </span>
                     </div>
@@ -310,27 +318,27 @@ function DashboardContent() {
                   <div className="mt-auto pt-4 border-t border-border/50">
                     <h4 className="font-mono text-[10px] text-text-dim tracking-widest mb-3 uppercase">Top 3 Core Pathways</h4>
                     <div className="flex flex-col gap-2">
-                       {data.careerAlignment.slice(0,3).map((r, i) => (
-                           <div key={r.role} className="flex items-center justify-between p-2 rounded bg-surface/30 border border-border/30">
-                              <div className="flex items-center gap-3">
-                                <span className={`font-mono text-sm font-bold ${i===0 ? 'text-[#f5a623]' : i===1 ? 'text-slate-400' : 'text-[#b45309]'}`}>#{i+1}</span>
-                                <span className="font-mono text-[11px] text-text">{r.role}</span>
-                              </div>
-                              <span className="font-mono text-[11px] text-accent font-bold">{r.score}% Match</span>
-                           </div>
-                       ))}
+                      {data.careerAlignment.slice(0, 3).map((r, i) => (
+                        <div key={r.role} className="flex items-center justify-between p-2 rounded bg-surface/30 border border-border/30">
+                          <div className="flex items-center gap-3">
+                            <span className={`font-mono text-sm font-bold ${i === 0 ? 'text-[#f5a623]' : i === 1 ? 'text-slate-400' : 'text-[#b45309]'}`}>#{i + 1}</span>
+                            <span className="font-mono text-[11px] text-text">{r.role}</span>
+                          </div>
+                          <span className="font-mono text-[11px] text-accent font-bold">{r.score}% Match</span>
+                        </div>
+                      ))}
                     </div>
                   </div>
                 </SectionCard>
               </div>
-              
+
               <SectionCard title="GitHub Ecosystem" badge="DEPENDENCIES" className="mb-4">
                 <div className="flex flex-wrap gap-2 mt-4">
                   {(() => {
                     const depSet = new Set(data.topRepos.flatMap(r => r.dependencyFiles || []));
                     const allDeps = Array.from(depSet);
                     if (allDeps.length === 0) return <span className="text-muted text-xs">No frameworks or major dependencies detected.</span>;
-                    
+
                     let insight = "";
                     if (allDeps.some(d => ["package.json", "tailwind.config.js", "next.config.js", "vite.config.ts"].includes(d))) insight = "Strong front-end and full-stack JavaScript signals.";
                     else if (allDeps.some(d => ["requirements.txt", "Pipfile", "environment.yml", "setup.py"].includes(d))) insight = "Python data science / backend signals detected.";
@@ -378,35 +386,35 @@ function DashboardContent() {
             <>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <ProfileCompleteness score={data.completeness} />
-                
+
                 {/* Score breakdown could go here alongside profile completeness to balance layout */}
                 <SectionCard title="Score Methodology" badge="6 DIMENSIONS" className="h-full">
                   <div className="flex flex-col gap-3 h-full justify-between">
                     <div className="grid grid-cols-2 gap-2">
-                        {data.scoreBreakdown.dimensions.map((dim) => (
-                          <div key={dim.label} className="border border-border/50 rounded p-2 bg-surface/30">
-                            <div className="flex justify-between items-center mb-1">
-                              <span className="font-mono text-[9px] text-muted">{dim.label}</span>
-                              <span
-                                className="font-mono text-[10px] font-bold"
-                                style={{
-                                  color: dim.score >= 80 ? "#00ff88" : dim.score >= 65 ? "#f5a623" : "#f87171"
-                                }}
-                              >
-                                {dim.score}
-                              </span>
-                            </div>
-                            <div className="w-full h-0.5 bg-border rounded-full overflow-hidden">
-                              <div
-                                className="h-full rounded-full"
-                                style={{
-                                  width: `${dim.score}%`,
-                                  backgroundColor: dim.score >= 80 ? "#00ff88" : dim.score >= 65 ? "#f5a623" : "#f87171"
-                                }}
-                              />
-                            </div>
+                      {data.scoreBreakdown.dimensions.map((dim) => (
+                        <div key={dim.label} className="border border-border/50 rounded p-2 bg-surface/30">
+                          <div className="flex justify-between items-center mb-1">
+                            <span className="font-mono text-[9px] text-muted">{dim.label}</span>
+                            <span
+                              className="font-mono text-[10px] font-bold"
+                              style={{
+                                color: dim.score >= 80 ? "#00ff88" : dim.score >= 65 ? "#f5a623" : "#f87171"
+                              }}
+                            >
+                              {dim.score}
+                            </span>
                           </div>
-                        ))}
+                          <div className="w-full h-0.5 bg-border rounded-full overflow-hidden">
+                            <div
+                              className="h-full rounded-full"
+                              style={{
+                                width: `${dim.score}%`,
+                                backgroundColor: dim.score >= 80 ? "#00ff88" : dim.score >= 65 ? "#f5a623" : "#f87171"
+                              }}
+                            />
+                          </div>
+                        </div>
+                      ))}
                     </div>
                     <p className="font-mono text-[9px] text-accent/60 leading-relaxed border-t border-border/50 pt-3 mt-1">
                       <strong className="text-accent/80">Weighting:</strong> Project Quality (30%), Consistency (20%), Breadth (15%), Depth (15%), Documentation (10%), Community (10%).
@@ -456,7 +464,7 @@ function DashboardContent() {
 
           {activeTab === "history" && (
             <div className="animate-in fade-in duration-300">
-               <HistoryPanel data={data} />
+              <HistoryPanel data={data} />
             </div>
           )}
         </div>
@@ -464,17 +472,17 @@ function DashboardContent() {
         {/* Future Features Roadmap (shown on all tabs effectively at the bottom) */}
         <SectionCard title="Coming Soon" badge="ROADMAP" className="mt-8 mb-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {[
-              { icon: "⚔️", title: "Comparative Analysis", desc: "Side-by-side profile comparison with diff visualization" },
-              { icon: "📈", title: "Timeline View", desc: "Historical score tracking across monthly snapshots" },
-              { icon: "👥", title: "Team Dashboard", desc: "Aggregate analysis for GitHub organizations" },
-              { icon: "🏷️", title: "README Badge", desc: "Embeddable SVG badge for your portfolio score" },
-            ].map((f) => (
+            {([
+              { icon: "swords", title: "Comparative Analysis", desc: "Side-by-side profile comparison with diff visualization" },
+              { icon: "trend", title: "Timeline View", desc: "Historical score tracking across monthly snapshots" },
+              { icon: "users", title: "Team Dashboard", desc: "Aggregate analysis for GitHub organizations" },
+              { icon: "badge", title: "README Badge", desc: "Embeddable SVG badge for your portfolio score" },
+            ] as const).map((f) => (
               <div
                 key={f.title}
                 className="border border-border/30 rounded-lg p-3 bg-surface/20 flex items-start gap-3 opacity-60"
               >
-                <span className="text-lg">{f.icon}</span>
+                <RoadmapIcon type={f.icon} />
                 <div>
                   <h4 className="font-mono text-xs text-text-dim font-bold">{f.title}</h4>
                   <p className="font-mono text-[10px] text-muted">{f.desc}</p>

@@ -110,8 +110,8 @@ export function LoadingScreen({ onComplete }: LoadingScreenProps) {
     }, 25);
 
     const pulseTimer = setTimeout(() => setPhase("pulse"), 400);
-    const exitTimer  = setTimeout(() => setPhase("exit"),  1600);
-    const doneTimer  = setTimeout(() => onComplete(),      2100);
+    const exitTimer = setTimeout(() => setPhase("exit"), 1600);
+    const doneTimer = setTimeout(() => onComplete(), 2100);
 
     return () => {
       clearInterval(progressInterval);
@@ -123,9 +123,8 @@ export function LoadingScreen({ onComplete }: LoadingScreenProps) {
 
   return (
     <div
-      className={`fixed inset-0 z-[9999] flex flex-col items-center justify-center transition-all duration-500 ${
-        phase === "exit" ? "opacity-0 scale-105" : "opacity-100 scale-100"
-      }`}
+      className={`fixed inset-0 z-[9999] flex flex-col items-center justify-center transition-all duration-500 ${phase === "exit" ? "opacity-0 scale-105" : "opacity-100 scale-100"
+        }`}
       style={{ background: "var(--bg)" }}
     >
       {/* Subtle grid */}
@@ -145,9 +144,8 @@ export function LoadingScreen({ onComplete }: LoadingScreenProps) {
       />
 
       <div
-        className={`relative flex flex-col items-center gap-7 transition-all duration-500 ${
-          phase === "enter" ? "opacity-0 translate-y-3" : "opacity-100 translate-y-0"
-        }`}
+        className={`relative flex flex-col items-center gap-7 transition-all duration-500 ${phase === "enter" ? "opacity-0 translate-y-3" : "opacity-100 translate-y-0"
+          }`}
       >
         {/* Logo with slow-spin orbit ring */}
         <div className="relative" style={{ width: 100, height: 100 }}>

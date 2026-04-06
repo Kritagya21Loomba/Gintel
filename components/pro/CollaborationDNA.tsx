@@ -1,18 +1,18 @@
 "use client";
 
 import type { CollaborationProfile } from "@/types/pro";
-import { Users, GitPullRequest, MessageSquare, GitFork } from "lucide-react";
+import { Users, GitPullRequest, MessageSquare, GitFork, Cpu, Shield, Search, Star, Building2 } from "lucide-react";
 
 interface Props {
   collaboration: CollaborationProfile;
 }
 
-const STYLE_META: Record<string, { label: string; desc: string; emoji: string }> = {
-  "solo-builder": { label: "Solo Builder", desc: "You ship independently — deep focus, high autonomy", emoji: "🏗️" },
-  "team-player": { label: "Team Player", desc: "Balanced between PRs and reviews — strong team fit", emoji: "🤝" },
-  "mentor": { label: "Mentor", desc: "High review activity + strong documentation — you uplift others", emoji: "🎓" },
-  "code-reviewer": { label: "Code Reviewer", desc: "Reviews outweigh PRs — you're the quality gatekeeper", emoji: "🔍" },
-  "community-leader": { label: "Community Leader", desc: "High stars, forks, and followers — you build movements", emoji: "🌟" },
+const STYLE_META: Record<string, { label: string; desc: string; icon: React.ReactNode }> = {
+  "solo-builder": { label: "Solo Builder", desc: "You ship independently — deep focus, high autonomy", icon: <Cpu size={16} /> },
+  "team-player": { label: "Team Player", desc: "Balanced between PRs and reviews — strong team fit", icon: <Users size={16} /> },
+  "mentor": { label: "Mentor", desc: "High review activity + strong documentation — you uplift others", icon: <Shield size={16} /> },
+  "code-reviewer": { label: "Code Reviewer", desc: "Reviews outweigh PRs — you're the quality gatekeeper", icon: <Search size={16} /> },
+  "community-leader": { label: "Community Leader", desc: "High stars, forks, and followers — you build movements", icon: <Star size={16} /> },
 };
 
 export function CollaborationDNA({ collaboration }: Props) {
@@ -23,7 +23,7 @@ export function CollaborationDNA({ collaboration }: Props) {
       {/* Collaboration style */}
       <div className="border border-accent/15 rounded-lg p-4 bg-accent/[0.02]">
         <div className="flex items-center gap-3 mb-1">
-          <span className="text-xl">{style.emoji}</span>
+          <div className="text-accent opacity-80">{style.icon}</div>
           <div>
             <div className="font-mono text-sm text-accent font-bold">{style.label}</div>
             <div className="font-mono text-[10px] text-text-dim">{style.desc}</div>
@@ -33,26 +33,10 @@ export function CollaborationDNA({ collaboration }: Props) {
 
       {/* Metrics grid */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-        <MetricCard
-          icon={<GitPullRequest size={12} />}
-          label="Est. PRs"
-          value={collaboration.prMetrics.totalPRs}
-        />
-        <MetricCard
-          icon={<MessageSquare size={12} />}
-          label="Issues Opened"
-          value={collaboration.issueMetrics.issuesOpened}
-        />
-        <MetricCard
-          icon={<GitFork size={12} />}
-          label="Merge Rate"
-          value={`${collaboration.prMetrics.mergeRate}%`}
-        />
-        <MetricCard
-          icon={<Users size={12} />}
-          label="Reviews Given"
-          value={collaboration.prMetrics.reviewsGiven}
-        />
+        <MetricCard icon={<GitPullRequest size={12} />} label="Est. PRs" value={collaboration.prMetrics.totalPRs} />
+        <MetricCard icon={<MessageSquare size={12} />} label="Issues Opened" value={collaboration.issueMetrics.issuesOpened} />
+        <MetricCard icon={<GitFork size={12} />} label="Merge Rate" value={`${collaboration.prMetrics.mergeRate}%`} />
+        <MetricCard icon={<Users size={12} />} label="Reviews Given" value={collaboration.prMetrics.reviewsGiven} />
       </div>
 
       {/* Team signals */}
@@ -60,18 +44,17 @@ export function CollaborationDNA({ collaboration }: Props) {
         <span className="font-mono text-xs text-muted mb-2 block">TEAM SIGNALS</span>
         <div className="grid grid-cols-3 gap-2">
           <div className="border border-border/30 rounded-lg p-3">
-            <div className={`font-mono text-xs font-bold ${
-              collaboration.teamSignals.averageCommitSize === "atomic" ? "text-accent" :
-              collaboration.teamSignals.averageCommitSize === "medium" ? "text-sky" : "text-amber"
-            }`}>
+            <div className={`font-mono text-xs font-bold ${collaboration.teamSignals.averageCommitSize === "atomic" ? "text-accent" :
+                collaboration.teamSignals.averageCommitSize === "medium" ? "text-sky" : "text-amber"
+              }`}>
               {collaboration.teamSignals.averageCommitSize.charAt(0).toUpperCase() +
-               collaboration.teamSignals.averageCommitSize.slice(1)}
+                collaboration.teamSignals.averageCommitSize.slice(1)}
             </div>
             <div className="font-mono text-[10px] text-muted">Commit Size</div>
           </div>
           <div className="border border-border/30 rounded-lg p-3">
             <div className="font-mono text-xs font-bold text-text">
-              {collaboration.teamSignals.usesConventionalCommits ? "Yes ✓" : "No"}
+              {collaboration.teamSignals.usesConventionalCommits ? "Yes" : "No"}
             </div>
             <div className="font-mono text-[10px] text-muted">Conv. Commits</div>
           </div>
