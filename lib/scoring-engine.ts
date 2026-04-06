@@ -9,6 +9,9 @@ import type {
   GitHubProfile,
   ScoreBreakdown,
   ScoreDimension,
+  RedFlag,
+  CompletenessScore,
+  RepoQualityCard,
 } from "@/types";
 
 // ─── Constants ────────────────────────────────────────────────
@@ -477,7 +480,10 @@ export function generateRecommendations(
   repos: Repository[],
   langs: LanguageStat[],
   commits: WeeklyCommit[],
-  breakdown: ScoreBreakdown
+  breakdown: ScoreBreakdown,
+  allRepos: Repository[],
+  completeness: CompletenessScore,
+  redFlags: RedFlag[]
 ): Recommendation[] {
   const recs: Recommendation[] = [];
   let id = 0;
@@ -485,12 +491,14 @@ export function generateRecommendations(
   // README quality check
   const lowReadme = repos.filter((r) => r.readmeScore < 60);
   if (lowReadme.length > 0) {
+    const estimatedScoreImpact = Math.round((lowReadme.length / repos.length) * 12);
     recs.push({
       id: `r${++id}`,
       type: "warning",
       title: "README quality is dragging your score down",
-      description: `${lowReadme.length} of your top repos (${lowReadme.map(r => r.name).join(", ")}) have README scores under 60. Add badges, installation steps, and usage examples — recruiters abandon repos in <10s without them.`,
+      description: `${lowReadme.length} of your top repos (${lowReadme.map(r => r.name).join(", ")}) have README scores under 60. Add badges, installation steps, and usage examples.`,
       impact: "high",
+      estimatedScoreImpact: estimatedScoreImpact > 0 ? estimatedScoreImpact : 2
     });
   }
 
@@ -499,26 +507,29 @@ export function generateRecommendations(
   if (consistencyDim && consistencyDim.score < 60) {
     const vals = commits.map((w) => w.commits);
     const lowWeeks = vals.filter((v) => v < 5).length;
+    const impact = 95 - consistencyDim.score;
     recs.push({
       id: `r${++id}`,
       type: "improvement",
       title: "Commit frequency is too spiky",
-      description: `You have ${lowWeeks} weeks with <5 commits out of ${commits.length} total. A more consistent cadence (even 2-3 commits on slow weeks) dramatically improves your consistency signal from ${consistencyDim.score} to an estimated ${Math.min(consistencyDim.score + 15, 95)}.`,
+      description: `You have ${lowWeeks} weeks with <5 commits out of ${commits.length} total. A more consistent cadence (even 2-3 commits on slow weeks) improves your consistency signal.`,
       impact: "medium",
+      estimatedScoreImpact: Math.min(Math.round(impact * 0.2), 15) // Consistency is 20% weight
     });
   }
 
   // Missing deployment signals
   const allTopics = repos.flatMap((r) => r.topics);
   const hasML = allTopics.some((t) => ["machine-learning", "ml", "ai", "deep-learning", "pytorch", "tensorflow"].includes(t));
-  const hasDeployment = allTopics.some((t) => ["docker", "kubernetes", "deployment", "api", "fastapi", "serverless"].includes(t));
+  const hasDeployment = repos.some(r => r.hasPages || r.topics.some(t => ["docker", "kubernetes", "deployment", "api", "fastapi", "serverless"].includes(t)));
   if (hasML && !hasDeployment) {
     recs.push({
       id: `r${++id}`,
       type: "opportunity",
       title: "Strong ML signals, but no deployment project",
-      description: "You show ML competency but lack a deployed inference project. A FastAPI + ONNX inference service would unlock ML Engineer roles and push your career alignment score significantly.",
+      description: "You show ML competency but lack a deployed inference project. A FastAPI + ONNX inference service would unlock ML Engineer roles.",
       impact: "high",
+      estimatedScoreImpact: 8
     });
   }
 
@@ -529,8 +540,9 @@ export function generateRecommendations(
       id: `r${++id}`,
       type: "improvement",
       title: "Zero infrastructure signals detected",
-      description: "No Dockerfile, Kubernetes, or Terraform signals found. Even a single well-documented containerized project pushes your DevOps alignment significantly and shows production readiness.",
+      description: "No Dockerfile, Kubernetes, or Terraform signals found. A containerized project pushes your DevOps alignment.",
       impact: "medium",
+      estimatedScoreImpact: 5
     });
   }
 
@@ -542,8 +554,9 @@ export function generateRecommendations(
       id: `r${++id}`,
       type: "opportunity",
       title: `${topRepo.name} is approaching viral threshold`,
-      description: `At ${topRepo.stars.toLocaleString()} stars, you're within striking distance of ${threshold} territory. A well-placed blog post, demo video, or Show HN could catalyze exponential growth. High-leverage.`,
+      description: `At ${topRepo.stars.toLocaleString()} stars, you're within striking distance of ${threshold} territory. High-leverage.`,
       impact: "high",
+      estimatedScoreImpact: 10
     });
   }
 
@@ -554,22 +567,129 @@ export function generateRecommendations(
       id: `r${++id}`,
       type: "improvement",
       title: "Language diversity is below average",
-      description: `Your breadth score is ${breadthDim.score}/100. Consider adding a project in a complementary language (e.g., if you're Python-heavy, try Go or TypeScript) to demonstrate versatility.`,
+      description: `Your breadth score is ${breadthDim.score}/100. Consider adding a project in a complementary language to demonstrate versatility.`,
       impact: "medium",
+      estimatedScoreImpact: 6
+    });
+  }
+  
+  // Profile Completeness Gap
+  if (completeness.score < 8) {
+    recs.push({
+      id: `r${++id}`,
+      type: "improvement",
+      title: "Incomplete Profile Visibility",
+      description: `Your profile completeness is ${completeness.score}/8. Fixing missing fields like your bio or location makes an immediate positive impression.`,
+      impact: "high",
+      estimatedScoreImpact: (8 - completeness.score) * 2
     });
   }
 
-  // Documentation strength
-  const docDim = breakdown.dimensions.find((d) => d.label === "Documentation");
-  if (docDim && docDim.score >= 80) {
-    recs.push({
-      id: `r${++id}`,
-      type: "opportunity",
-      title: "Your docs game is strong — leverage it",
-      description: `Documentation score ${docDim.score}/100 puts you in the top quartile. Consider contributing to open-source documentation or starting a technical blog to amplify this signal.`,
-      impact: "low",
-    });
-  }
+  // Focus on top recommendation
+  recs.sort((a, b) => (b.estimatedScoreImpact || 0) - (a.estimatedScoreImpact || 0));
 
   return recs.slice(0, 6); // Cap at 6 recommendations
 }
+
+// ─── New Priority Features ─────────────────────────────────────
+
+export function scoreRepoQuality(repo: Repository, commits: WeeklyCommit[]): RepoQualityCard {
+  // Activity score based on commits
+  const commitCount = commits.reduce((sum, w) => sum + w.commits, 0); // Simplified activity proxy
+  
+  // Test File Ratio heuristic (approximated here by topics or simple presence if we had tree scope)
+  const testsScore = repo.topics.some(t => ["test", "jest", "pytest", "mocha", "cypress"].includes(t)) ? 100 : 0;
+  
+  // Deployment Signal
+  const deploymentScore = repo.hasPages || repo.topics.some(t => ["vercel", "netlify", "docker", "kubernetes", "aws", "deploy"].includes(t)) ? 100 : 0;
+  
+  const descriptionScore = repo.description && repo.description.length > 10 ? 100 : 0;
+  
+  const activityScore = Math.min(Math.round(repo.impactScore * 1.5), 100);
+
+  const total = Math.round(
+    repo.readmeScore * 0.3 + testsScore * 0.2 + activityScore * 0.2 + deploymentScore * 0.15 + descriptionScore * 0.15
+  );
+
+  return {
+    readme: repo.readmeScore,
+    tests: testsScore,
+    activity: activityScore,
+    deployment: deploymentScore,
+    description: descriptionScore,
+    total
+  };
+}
+
+export function detectRedFlags(profile: GitHubProfile, repos: Repository[]): RedFlag[] {
+  const flags: RedFlag[] = [];
+  let id = 1;
+
+  // 1. Forked repo dominance
+  const forks = repos.filter(r => r.isForked).length;
+  if (repos.length > 0 && forks / repos.length > 0.5) {
+    flags.push({
+      id: `flag-${id++}`,
+      title: "Forked Repo Dominance",
+      description: `More than 50% of your public repos are forks. Forks without subsequent commits add no signal and dilute your portfolio.`
+    });
+  }
+
+  // 2. Repo name quality
+  const badNames = ["test", "asdf", "repo1", "untitled", "copy", "new-folder", "temp"];
+  const carelesslyNamed = repos.filter(r => badNames.includes(r.name.toLowerCase()));
+  if (carelesslyNamed.length > 0) {
+    flags.push({
+      id: `flag-${id++}`,
+      title: "Careless Repository Naming",
+      description: `You have repos named like test, untitled, or temp. These signal carelessness about profile presentation and should be made private.`
+    });
+  }
+
+  // 3. Stale pinned repos
+  const pinned = repos.filter(r => r.isPinned);
+  const stalePinned = pinned.filter(r => {
+    const ageInDays = (new Date().getTime() - new Date(r.pushedAt || r.updatedAt).getTime()) / (1000 * 3600 * 24);
+    return ageInDays > 365;
+  });
+  if (stalePinned.length > 0) {
+    flags.push({
+      id: `flag-${id++}`,
+      title: "Stale Pinned Repositories",
+      description: `You have pinned repos that haven't been touched in over a year. Consider pinning your most active and recent work.`
+    });
+  }
+
+  // 4. Empty repo count (approximated by pushed_at equals created_at roughly, or very young)
+  const empty = repos.filter(r => r.stars === 0 && r.forks === 0 && r.createdAt === r.pushedAt);
+  if (empty.length > 3) {
+    flags.push({
+      id: `flag-${id++}`,
+      title: "High Empty Repo Count",
+      description: `You have ${empty.length} repositories with no substantive activity. These pad your repo count while contributing nothing.`
+    });
+  }
+
+  return flags;
+}
+
+export function computeProfileCompleteness(profile: GitHubProfile, repos: Repository[]): CompletenessScore {
+  const checks = [
+    { label: "Profile photo set", passed: !!(profile.avatar && !profile.avatar.includes("identicon")) }, // simplistic identicon check
+    { label: "Bio filled in", passed: profile.bio.length > 10 },
+    { label: "Location set", passed: !!profile.location },
+    { label: "Website or URL set", passed: !!profile.blog },
+    { label: "Twitter/X handle linked", passed: !!profile.twitterUsername },
+    { label: "Pinned repos configured", passed: repos.some(r => r.isPinned) },
+    { label: "Repos with descriptions ratio > 50%", passed: repos.length > 0 && repos.filter(r => r.description).length / repos.length > 0.5 },
+    { label: "Any repos with GitHub Pages", passed: repos.some(r => r.hasPages) }
+  ];
+
+  const score = checks.filter(c => c.passed).length;
+  
+  return {
+    score,
+    checks
+  };
+}
+
