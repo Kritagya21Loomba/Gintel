@@ -10,8 +10,8 @@ import {
 } from "./scoring-engine";
 
 const profile = {
-  username: "alexchen",
-  name: "Alex Chen",
+  username: "johndoe",
+  name: "John Doe",
   avatar: "https://avatars.githubusercontent.com/u/583231?v=4",
   bio: "Building things that matter. Open source enthusiast. Coffee-driven.",
   followers: 847,
@@ -19,8 +19,8 @@ const profile = {
   publicRepos: 62,
   company: "@vercel",
   location: "San Francisco, CA",
-  blog: "alexchen.dev",
-  twitterUsername: "alexchen",
+  blog: "johndoe.dev",
+  twitterUsername: "johndoe",
   createdAt: "2019-03-12",
 };
 

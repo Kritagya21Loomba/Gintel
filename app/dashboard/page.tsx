@@ -383,14 +383,14 @@ function DashboardContent() {
               {hasStarredCV === false ? (
                 <div className="relative">
                   <div className="pointer-events-none blur-sm opacity-50 select-none">
-                    <CVInsights />
+                    <CVInsights isDemo={mode === "mock"} />
                   </div>
                   <div className="absolute inset-0 z-20 flex items-center justify-center p-4">
                     <StarGatePrompt onVerify={verifyStar} isLoading={verifyingStar} />
                   </div>
                 </div>
               ) : (
-                <CVInsights />
+                <CVInsights isDemo={mode === "mock"} />
               )}
             </div>
           )}

@@ -58,9 +58,11 @@ function InsightCard({
   );
 }
 
-interface CVInsightsProps {}
+interface CVInsightsProps {
+  isDemo?: boolean;
+}
 
-export function CVInsights({}: CVInsightsProps) {
+export function CVInsights({ isDemo }: CVInsightsProps) {
   const [file, setFile] = useState<File | null>(null);
   const [isParsing, setIsParsing] = useState(false);
   const [parsedText, setParsedText] = useState("");
@@ -69,6 +71,36 @@ export function CVInsights({}: CVInsightsProps) {
 
   // Hydrate from localStorage on mount
   useEffect(() => {
+    if (isDemo) {
+      setFile({ name: "John_Doe_RESUME_v6_FINAL.pdf" } as any);
+      setParsedText("Demo Resume Text...");
+      setInsights({
+        xyzScore: 6,
+        xyzMatches: [
+          "Engineered scalable backend service resolving 10k RPS", 
+          "Optimized DB query latency by 45% using Redis caching",
+          "Reduced CI/CD build pipeline time by 20% leveraging Docker",
+          "Spearheaded migration to microservices increasing uptime to 99.9%"
+        ],
+        actionCount: 24,
+        weakCount: 2,
+        actionMatches: ["spearheaded", "architected", "engineered", "optimized", "scaled", "deployed", "implemented"],
+        weakMatches: ["helped", "handled"],
+        metricDensity: 8,
+        metricMatches: ["45%", "10k", "99.9%", "3x", "20%", "5ms", "2M", "$40k"],
+        spreadCount: 4,
+        spreadMatches: ["react", "aws", "node", "docker"],
+        clicheCount: 0,
+        clicheMatches: [],
+        wordCount: 450,
+        avgSentenceLength: 18,
+        sentenceLengths: Array.from({length: 42}, () => Math.floor(Math.random() * (28 - 12 + 1)) + 12).map((len) => ({ length: len, snippet: "Architected modern scalable solutions..." })).concat([{length: 46, snippet: "Worked on various tasks including managing the deployment phase which helped the company save..."}]),
+        brevityStatus: "good",
+        brevityMsg: "Solid readability formatting dimensions."
+      });
+      return;
+    }
+
     const cached = localStorage.getItem("gintel_cv_cache");
     if (cached) {
       try {
@@ -201,8 +233,12 @@ export function CVInsights({}: CVInsightsProps) {
     });
 
     // 6. ATS Readability & Brevity Rules
-    const sentenceLengths = sentences.map(s => s.split(/\s+/).filter(w => w.length > 0).length).filter(len => len > 0);
-    const avgSentenceLength = sentenceLengths.length > 0 ? Math.round(words.length / sentenceLengths.length) : 0;
+    const sentenceObjs = sentences.map(s => {
+      const w = s.split(/\s+/).filter(w => w.length > 0);
+      return { length: w.length, snippet: w.slice(0, 8).join(" ") + (w.length > 8 ? "..." : "") };
+    }).filter(obj => obj.length > 0);
+    
+    const avgSentenceLength = sentenceObjs.length > 0 ? Math.round(words.length / sentenceObjs.length) : 0;
     let brevityStatus = "good";
     let brevityMsg = "Solid readability formatting dimensions.";
     if (avgSentenceLength > 30) {
@@ -219,7 +255,7 @@ export function CVInsights({}: CVInsightsProps) {
       metricDensity, metricMatches,
       spreadCount, spreadMatches,
       clicheCount, clicheMatches,
-      wordCount, avgSentenceLength, sentenceLengths, brevityStatus, brevityMsg
+      wordCount, avgSentenceLength, sentenceLengths: sentenceObjs, brevityStatus, brevityMsg
     });
   };
 
@@ -348,7 +384,9 @@ export function CVInsights({}: CVInsightsProps) {
               {/* Baseline markers */}
               <div className="absolute left-0 right-0 bottom-6 border-b border-dashed border-border/40 z-0"></div>
               
-              {insights.sentenceLengths.map((len: number, idx: number) => {
+              {insights.sentenceLengths.map((obj: any, idx: number) => {
+                const len = obj.length || obj; // Fallback just in case some legacy localstorage payload had number array
+                const snippet = obj.snippet || "Sentence segment";
                 // Max height capping for visualization scale (cap at 60 words for UI bounds)
                 const clampedLen = Math.min(len, 60); 
                 const heightPercentage = Math.max((clampedLen / 60) * 100, 4); // Min 4% height
@@ -363,8 +401,9 @@ export function CVInsights({}: CVInsightsProps) {
                     className={`w-2.5 shrink-0 rounded-t-sm transition-all duration-300 hover:opacity-100 z-10 ${colorClass} hover:brightness-125 cursor-crosshair group relative`}
                     style={{ height: `${heightPercentage}%` }}
                   >
-                    <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-surface border border-border px-2 py-1 rounded font-mono text-[10px] text-text whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity z-20 pointer-events-none">
-                      {len} words
+                    <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-surface border border-border px-3 py-1.5 rounded font-mono text-[10px] text-text whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity z-20 pointer-events-none flex flex-col items-center gap-1 shadow-xl">
+                      <span className="font-bold text-accent">{len} words</span>
+                      <span className="text-text-dim max-w-[150px] whitespace-normal text-center leading-tight">"{snippet}"</span>
                     </div>
                   </div>
                 );
