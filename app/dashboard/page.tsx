@@ -5,7 +5,7 @@ import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { MOCK_DATA } from "@/lib/mock-data";
 import { fetchFullAnalysis } from "@/lib/github-api";
-import { recordAnalysis } from "@/lib/metrics";
+import { recordDeveloperIfNew, recordReposDelta } from "@/lib/metrics";
 import { DashboardNav } from "@/components/dashboard/DashboardNav";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { DashboardTabs, type TabId } from "@/components/dashboard/DashboardTabs";
@@ -139,8 +139,11 @@ function DashboardContent() {
         try {
           const result = await fetchFullAnalysis((session as any).accessToken);
           setData(result);
-          // Record metrics
-          recordAnalysis(result.topRepos.length, result.recommendations.length);
+          // Record metrics — developer counted once per unique user,
+          // repos counted by delta (handles new repos added since last visit)
+          const username = result.profile.username;
+          recordDeveloperIfNew(username);
+          recordReposDelta(username, result.profile.publicRepos);
         } catch (err: any) {
           console.error("GitHub API error:", err);
           setError("Failed to fetch GitHub data. Falling back to demo data.");
@@ -148,8 +151,7 @@ function DashboardContent() {
         }
       } else {
         setData(MOCK_DATA);
-        // Record mock analysis for metrics
-        recordAnalysis(MOCK_DATA.topRepos.length, MOCK_DATA.recommendations.length);
+        // Do not increment metrics for demo/mock mode
       }
 
       setLoading(false);

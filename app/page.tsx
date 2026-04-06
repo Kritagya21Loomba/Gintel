@@ -11,7 +11,7 @@ const FEATURES = [
   {
     icon: <Zap size={18} />,
     title: "Developer Identity",
-    desc: "Classified into 7 archetypes based on your actual commit patterns, not your job title.",
+    desc: "Classified into distinct archetypes based on your actual commit patterns, not your job title.",
   },
   {
     icon: <BarChart2 size={18} />,
@@ -25,8 +25,8 @@ const FEATURES = [
   },
   {
     icon: <Star size={18} />,
-    title: "Actionable Gaps",
-    desc: "Specific, prioritized recommendations. Not generic advice — based on your actual repos.",
+    title: "CV Intelligence",
+    desc: "Upload your CV and get instant, data-backed feedback on impact, verb strength, and keyword density.",
   },
 ];
 
@@ -273,9 +273,9 @@ export default function Home() {
           <div className="max-w-5xl mx-auto px-6">
             <div className="flex flex-wrap justify-center gap-8 md:gap-0 md:divide-x md:divide-border/50">
               {[
-                { label: "Developers analyzed", value: metrics?.developersAnalyzed || 12847 },
-                { label: "Repos scanned", value: metrics?.reposScanned || 48219 },
-                { label: "Insights generated", value: metrics?.insightsGenerated || 94331 },
+                { label: "Developers analyzed", value: metrics?.developersAnalyzed || 22 },
+                { label: "Repos scanned", value: metrics?.reposScanned || 88 },
+                { label: "CVs analyzed", value: metrics?.cvInsightsGenerated || 2 },
               ].map((s) => (
                 <div key={s.label} className="text-center px-10">
                   <div className="font-display font-extrabold text-3xl" style={{ color: "var(--cyan)" }}>
