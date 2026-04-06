@@ -13,6 +13,18 @@ export async function POST(req: Request) {
     let text = "";
 
     if (file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf")) {
+      // Polyfill DOMMatrix for pdf.js in Node.js environment
+      if (typeof global.DOMMatrix === "undefined") {
+        (global as any).DOMMatrix = class DOMMatrix {
+          a=1; b=0; c=0; d=1; e=0; f=0;
+          constructor() {}
+          multiply() { return this; }
+          inverse() { return this; }
+          translate() { return this; }
+          scale() { return this; }
+        };
+      }
+      
       const pdfParse = (await import("pdf-parse")).default;
       const data = await pdfParse(buffer);
       text = data.text;
