@@ -30,7 +30,7 @@ export function DashboardNav({ isLive = false }: DashboardNavProps) {
         {/* Logo */}
         <div className="flex items-center gap-2">
           <GintelLogo size={22} />
-          <span className="font-mono text-accent text-xs font-bold tracking-widest">GINTEL</span>
+          <span className="font-bold tracking-widest text-accent text-sm" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>GINTEL</span>
           <span className="font-mono text-xs text-muted hidden sm:inline">/ Analysis Report</span>
         </div>
       </div>

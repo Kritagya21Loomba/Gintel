@@ -32,7 +32,7 @@ export function RepoCard({ repo, rank }: RepoCardProps) {
             {repo.name}
           </a>
           {repo.isForked && (
-            <span className="font-mono text-[9px] text-muted border border-border rounded px-1.5 py-0.5 flex-shrink-0">
+            <span className="font-mono text-[9px] text-muted border border-border rounded-md px-1.5 py-0.5 flex-shrink-0">
               FORK
             </span>
           )}
@@ -46,8 +46,8 @@ export function RepoCard({ repo, rank }: RepoCardProps) {
                 repo.impactScore >= 80
                   ? "#00ff88"
                   : repo.impactScore >= 60
-                  ? "#f5a623"
-                  : "#f87171",
+                    ? "#f5a623"
+                    : "#f87171",
             }}
           >
             {repo.impactScore}
@@ -68,7 +68,7 @@ export function RepoCard({ repo, rank }: RepoCardProps) {
           {repo.topics.slice(0, 4).map((t) => (
             <span
               key={t}
-              className="font-mono text-[9px] text-text-dim border border-border/60 rounded px-1.5 py-0.5 bg-surface"
+              className="font-mono text-[9px] text-text-dim border border-border/60 rounded-md px-1.5 py-0.5 bg-surface"
             >
               {t}
             </span>

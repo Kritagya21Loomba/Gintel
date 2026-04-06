@@ -169,8 +169,8 @@ function ArchetypeCard({ arch, rank }: { arch: ArchetypeScore; rank: number }) {
   return (
     <div
       className={`relative overflow-hidden rounded-xl border p-5 transition-all duration-300 group ${isUnlocked
-          ? "bg-surface/50 hover:border-accent/30"
-          : "bg-bg/40 border-border/20 opacity-60 hover:opacity-90"
+        ? "bg-surface/50 hover:border-accent/30"
+        : "bg-bg/40 border-border/20 opacity-60 hover:opacity-90"
         }`}
       style={isUnlocked ? { borderColor: color.primary + "25" } : {}}
     >
@@ -255,12 +255,15 @@ function LevelBadge({
   color: string;
   size?: "sm" | "lg";
 }) {
-  const sizeClass = size === "lg" ? "px-3 py-1.5 text-xs gap-2" : "px-2 py-1 text-[10px] gap-1.5";
+  const iconSize = size === "lg" ? 13 : 10;
+  const baseClass = size === "lg"
+    ? "flex items-center gap-1.5 px-2.5 py-1.5 rounded-md font-mono font-bold uppercase tracking-wider text-[11px]"
+    : "flex items-center gap-1 px-2 py-0.5 rounded-md font-mono font-bold uppercase tracking-wider text-[9px]";
 
   if (level === 3) {
     return (
-      <div className={`flex items-center ${sizeClass} bg-amber/10 text-amber border border-amber/25 rounded-lg font-mono font-bold uppercase tracking-wide`}>
-        <Trophy size={size === "lg" ? 14 : 11} fill="currentColor" />
+      <div className={`${baseClass} bg-amber/10 text-amber border border-amber/25`}>
+        <Trophy size={iconSize} fill="currentColor" />
         <span>Lvl 3 Master</span>
       </div>
     );
@@ -268,8 +271,8 @@ function LevelBadge({
 
   if (level === 2) {
     return (
-      <div className={`flex items-center ${sizeClass} bg-[#a78bfa]/10 text-[#a78bfa] border border-[#a78bfa]/25 rounded-lg font-mono font-bold uppercase tracking-wide`}>
-        <Sparkles size={size === "lg" ? 14 : 11} />
+      <div className={`${baseClass} bg-[#a78bfa]/10 text-[#a78bfa] border border-[#a78bfa]/25`}>
+        <Sparkles size={iconSize} />
         <span>Lvl 2 Pro</span>
       </div>
     );
@@ -277,14 +280,16 @@ function LevelBadge({
 
   return (
     <div
-      className={`flex items-center ${sizeClass} border rounded-lg font-mono font-bold uppercase tracking-wide`}
+      className={baseClass}
       style={{
         background: color + "15",
         color: color,
         borderColor: color + "30",
+        borderWidth: 1,
+        borderStyle: "solid",
       }}
     >
-      <ShieldCheck size={size === "lg" ? 14 : 11} />
+      <ShieldCheck size={iconSize} />
       <span>Lvl 1 Basic</span>
     </div>
   );

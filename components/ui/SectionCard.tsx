@@ -18,7 +18,7 @@ export function SectionCard({ title, badge, children, className }: SectionCardPr
       <div className="flex items-center justify-between px-5 py-3.5 border-b border-border/60">
         <span className="font-mono text-xs text-muted tracking-widest uppercase">{title}</span>
         {badge && (
-          <span className="font-mono text-[10px] text-accent/70 border border-accent/20 rounded-full px-2 py-0.5">
+          <span className="font-mono text-[10px] text-accent/70 border border-accent/20 rounded-md px-2 py-0.5">
             {badge}
           </span>
         )}

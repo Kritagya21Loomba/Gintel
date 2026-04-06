@@ -49,13 +49,13 @@ export function RecommendationCard({ rec, index }: RecommendationCardProps) {
           <div className="flex items-center gap-2 mb-1.5 flex-wrap">
             <h4 className="font-display font-semibold text-sm text-text">{rec.title}</h4>
             <span
-              className="font-mono text-[9px] font-bold tracking-widest px-1.5 py-0.5 rounded"
+              className="font-mono text-[9px] font-bold tracking-widest px-1.5 py-0.5 rounded-md"
               style={{ color: impact.color, background: `${impact.color}15` }}
             >
               {impact.label}
             </span>
             {rec.estimatedScoreImpact ? (
-              <span className="font-mono text-[9px] font-bold text-accent bg-accent/10 px-1.5 py-0.5 rounded ml-auto">
+              <span className="font-mono text-[9px] font-bold text-accent bg-accent/10 px-1.5 py-0.5 rounded-md ml-auto">
                 +{rec.estimatedScoreImpact} SCORE EXPT
               </span>
             ) : null}
