@@ -38,13 +38,17 @@ export function TemporalIntelligence({ temporal }: Props) {
   });
 
   function handleCellEnter(e: React.MouseEvent, day: string, hour: number, intensity: number) {
-    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+    // Use raw mouse viewport coords — immune to CSS transforms and scroll on parent containers
     setTooltip({
       visible: true,
-      x: rect.left + rect.width / 2,
-      y: rect.top,
+      x: e.clientX,
+      y: e.clientY,
       day, hour, intensity,
     });
+  }
+
+  function handleCellMove(e: React.MouseEvent) {
+    setTooltip(t => ({ ...t, x: e.clientX, y: e.clientY }));
   }
 
   function handleCellLeave() {
@@ -113,6 +117,7 @@ export function TemporalIntelligence({ temporal }: Props) {
                             : "rgba(255,255,255,0.03)",
                         }}
                         onMouseEnter={(e) => handleCellEnter(e, day, hourIdx, intensity)}
+                        onMouseMove={handleCellMove}
                         onMouseLeave={handleCellLeave}
                       />
                     );
@@ -121,13 +126,13 @@ export function TemporalIntelligence({ temporal }: Props) {
               </div>
             ))}
 
-            {/* Custom tooltip — fixed so it's never clipped by overflow containers */}
+            {/* Custom tooltip — fixed + mouse-tracked, immune to scroll/transform */}
             {tooltip.visible && (
               <div
                 className="fixed z-[9999] pointer-events-none"
                 style={{
                   left: tooltip.x,
-                  top: tooltip.y - 8,
+                  top: tooltip.y - 16,
                   transform: "translate(-50%, -100%)",
                 }}
               >

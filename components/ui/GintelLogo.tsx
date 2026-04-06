@@ -175,7 +175,7 @@ export function LoadingScreen({ onComplete }: LoadingScreenProps) {
 
         {/* ── Wordmark — appears after logo draws, slides up ── */}
         <div
-          className="flex flex-col items-center gap-3 overflow-hidden"
+          className="flex flex-col items-center gap-3"
           style={{
             opacity: showText ? 1 : 0,
             transform: showText ? "translateY(0)" : "translateY(18px)",
