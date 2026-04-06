@@ -22,17 +22,16 @@ import { formatNumber } from "@/lib/utils";
 import type { AnalysisResult } from "@/types";
 import { RedFlags } from "@/components/ui/RedFlags";
 import { ProfileCompleteness } from "@/components/ui/ProfileCompleteness";
-import { Loader2, ChevronDown, ChevronRight, Swords, TrendingUp, Users, Tag } from "lucide-react";
+import { Loader2, ChevronDown, ChevronRight, Swords, Users, Tag } from "lucide-react";
 import { ProSection } from "@/components/pro/ProSection";
 import { CVInsights } from "@/components/dashboard/CVInsights";
 import { StarGatePrompt } from "@/components/ui/StarGatePrompt";
 import { HistoryPanel } from "@/components/dashboard/HistoryPanel";
 import { ArchetypeGallery } from "@/components/dashboard/ArchetypeGallery";
 import { AchievementModal, type UnlockEvent } from "@/components/dashboard/AchievementModal";
-function RoadmapIcon({ type }: { type: "swords" | "trend" | "users" | "badge" }) {
+function RoadmapIcon({ type }: { type: "swords" | "users" | "badge" }) {
   const cls = "text-muted mt-0.5 flex-shrink-0";
   if (type === "swords") return <Swords size={14} className={cls} />;
-  if (type === "trend") return <TrendingUp size={14} className={cls} />;
   if (type === "users") return <Users size={14} className={cls} />;
   return <Tag size={14} className={cls} />;
 }
@@ -474,7 +473,6 @@ function DashboardContent() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {([
               { icon: "swords", title: "Comparative Analysis", desc: "Side-by-side profile comparison with diff visualization" },
-              { icon: "trend", title: "Timeline View", desc: "Historical score tracking across monthly snapshots" },
               { icon: "users", title: "Team Dashboard", desc: "Aggregate analysis for GitHub organizations" },
               { icon: "badge", title: "README Badge", desc: "Embeddable SVG badge for your portfolio score" },
             ] as const).map((f) => (
