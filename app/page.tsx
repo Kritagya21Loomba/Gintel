@@ -30,12 +30,7 @@ const FEATURES = [
   },
 ];
 
-const SAMPLE_INSIGHTS = [
-  "You resemble a backend-leaning engineer with strong Python/Go signals.",
-  "Your README quality is holding back your portfolio score.",
-  "turbo-query is 800 stars from Hacker News territory.",
-  "You show strong ML signals but lack a deployed inference project.",
-];
+
 
 function AnimatedCounter({ target, duration = 2000 }: { target: number; duration?: number }) {
   const [count, setCount] = useState(0);
@@ -82,7 +77,6 @@ function HomeContent() {
   const searchParams = useSearchParams();
   const { data: session, status } = useSession();
   const [loading, setLoading] = useState(false);
-  const [insightIdx, setInsightIdx] = useState(0);
   const [metrics, setMetrics] = useState<PlatformMetrics | null>(null);
   const [showLoader, setShowLoader] = useState(true);
   const [contentVisible, setContentVisible] = useState(false);
@@ -96,12 +90,7 @@ function HomeContent() {
     setMetrics(getMetrics());
   }, []);
 
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setInsightIdx((prev) => (prev + 1) % SAMPLE_INSIGHTS.length);
-    }, 4000);
-    return () => clearInterval(timer);
-  }, []);
+
 
   function handleLoaderComplete() {
     setShowLoader(false);
@@ -236,25 +225,19 @@ function HomeContent() {
             </button>
           </div>
 
-          <div className="mt-16 border border-border/50 rounded-xl bg-surface/50 p-5 max-w-2xl mx-auto stagger-child" style={{ animationDelay: "0.4s" }}>
-            <div className="flex items-center gap-2 mb-3">
-              <span className="font-mono text-[10px] text-muted tracking-widest">SAMPLE INSIGHT</span>
-              <div className="flex-1 h-px bg-border" />
-            </div>
-            <div className="flex items-start gap-3">
-              <span className="font-mono text-accent text-lg mt-0.5">›</span>
-              <p className="font-mono text-sm text-text-dim leading-relaxed text-left">
-                {SAMPLE_INSIGHTS[insightIdx]}
-              </p>
-            </div>
-            <div className="flex gap-1.5 mt-4 justify-center">
-              {SAMPLE_INSIGHTS.map((_, i) => (
-                <button
-                  key={i}
-                  onClick={() => setInsightIdx(i)}
-                  className={`h-1.5 rounded-full transition-all duration-300 ${i === insightIdx ? "bg-accent w-4" : "bg-border w-1.5"
-                    }`}
-                />
+          <div className="mt-16 border border-border/50 rounded-xl bg-surface/50 py-8 px-6 max-w-3xl mx-auto stagger-child" style={{ animationDelay: "0.4s" }}>
+            <div className="flex flex-wrap justify-center gap-8 md:gap-0 md:divide-x md:divide-border/50">
+              {[
+                { label: "Developers analyzed", value: metrics?.developersAnalyzed ?? 0 },
+                { label: "Repos scanned", value: metrics?.reposScanned ?? 0 },
+                { label: "CVs analyzed", value: metrics?.cvInsightsGenerated ?? 0 },
+              ].map((s) => (
+                <div key={s.label} className="text-center px-8">
+                  <div className="font-display font-extrabold text-3xl" style={{ color: "var(--cyan)" }}>
+                    <AnimatedCounter target={s.value} />
+                  </div>
+                  <div className="font-mono text-xs text-muted mt-1">{s.label}</div>
+                </div>
               ))}
             </div>
           </div>
@@ -282,25 +265,7 @@ function HomeContent() {
           </div>
         </section>
 
-        {/* Stats banner */}
-        <section className="relative z-10 border-t border-border/50 py-12">
-          <div className="max-w-5xl mx-auto px-6">
-            <div className="flex flex-wrap justify-center gap-8 md:gap-0 md:divide-x md:divide-border/50">
-              {[
-                { label: "Developers analyzed", value: metrics?.developersAnalyzed ?? 0 },
-                { label: "Repos scanned", value: metrics?.reposScanned ?? 0 },
-                { label: "CVs analyzed", value: metrics?.cvInsightsGenerated ?? 0 },
-              ].map((s) => (
-                <div key={s.label} className="text-center px-10">
-                  <div className="font-display font-extrabold text-3xl" style={{ color: "var(--cyan)" }}>
-                    <AnimatedCounter target={s.value} />
-                  </div>
-                  <div className="font-mono text-xs text-muted mt-1">{s.label}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
+
 
         {/* Footer */}
         <footer className="relative z-10 border-t border-border/30 py-10 px-6">
