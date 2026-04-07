@@ -93,24 +93,36 @@ export function ContributionHeatmap({ data }: ContributionHeatmapProps) {
 
       {/* Month labels */}
       <div className="flex gap-[3px] mb-1 ml-8">
-        {weeks.map((week, wi) => {
-          const firstRealDay = week.find((d) => d.date);
-          if (!firstRealDay) return <div key={wi} style={{ width: 11 }} />;
-          const month = new Date(firstRealDay.date).getMonth();
-          const isFirst = wi === 0 || (() => {
-            const prevWeek = weeks[wi - 1].find((d) => d.date);
-            return prevWeek ? new Date(prevWeek.date).getMonth() !== month : false;
-          })();
-          return (
-            <div key={wi} style={{ width: 11, flexShrink: 0 }}>
-              {isFirst && (
-                <span className="font-mono text-[9px] text-muted whitespace-nowrap">
-                  {MONTHS[month]}
-                </span>
-              )}
-            </div>
-          );
-        })}
+        {(() => {
+          let lastMonthLabelWi = -5;
+          return weeks.map((week, wi) => {
+            const firstRealDay = week.find((d) => d.date);
+            if (!firstRealDay) return <div key={wi} style={{ width: 11 }} />;
+            const month = new Date(firstRealDay.date).getMonth();
+            const isFirstInMonth = wi === 0 || (() => {
+              const prevWeek = weeks[wi - 1].find((d) => d.date);
+              return prevWeek ? new Date(prevWeek.date).getMonth() !== month : false;
+            })();
+            
+            let showLabel = false;
+            if (isFirstInMonth) {
+              if (wi - lastMonthLabelWi >= 3) { // Require ~3 weeks gap to prevent text overlap
+                showLabel = true;
+                lastMonthLabelWi = wi;
+              }
+            }
+
+            return (
+              <div key={wi} style={{ width: 11, flexShrink: 0 }}>
+                {showLabel && (
+                  <span className="font-mono text-[9px] text-muted whitespace-nowrap">
+                    {MONTHS[month]}
+                  </span>
+                )}
+              </div>
+            );
+          });
+        })()}
       </div>
 
       <div className="flex gap-[3px]">
