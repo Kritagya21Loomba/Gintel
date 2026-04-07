@@ -202,7 +202,7 @@ function HomeContent() {
             <span className="text-accent glow-text relative">
               speaking.
               <svg className="absolute -bottom-2 left-0 w-full" height="4" viewBox="0 0 100 4" preserveAspectRatio="none">
-                <path d="M0 2 Q25 0 50 2 Q75 4 100 2" stroke="#00ff88" strokeWidth="1" fill="none" opacity="0.5" />
+                <path d="M0 2 Q25 0 50 2 Q75 4 100 2" stroke="var(--accent)" strokeWidth="1" fill="none" opacity="0.5" />
               </svg>
             </span>
             <br />

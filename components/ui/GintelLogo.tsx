@@ -40,7 +40,7 @@ export function GintelLogo({ size = 32, className = "" }: GintelLogoProps) {
         </filter>
       </defs>
       <g filter={`url(#g-glow-${size})`}>
-        <circle cx={c} cy={c} r={R} stroke="#00ff88" strokeWidth={sw} strokeLinecap="round" fill="none"
+        <circle cx={c} cy={c} r={R} stroke="var(--logo-stroke)" strokeWidth={sw} strokeLinecap="round" fill="none"
           strokeDasharray={`${outerDash} ${outerGap}`}
           strokeDashoffset={mounted ? 0 : outerCirc}
           style={{
@@ -48,7 +48,7 @@ export function GintelLogo({ size = 32, className = "" }: GintelLogoProps) {
             transition: mounted ? "stroke-dashoffset 0.7s cubic-bezier(0.4,0,0.2,1)" : "none"
           }}
         />
-        <circle cx={c} cy={c} r={r} stroke="#00ff88" strokeWidth={sw} strokeLinecap="round" fill="none"
+        <circle cx={c} cy={c} r={r} stroke="var(--logo-stroke)" strokeWidth={sw} strokeLinecap="round" fill="none"
           strokeDasharray={`${innerDash} ${innerGap}`}
           strokeDashoffset={mounted ? 0 : innerCirc}
           style={{
@@ -57,7 +57,7 @@ export function GintelLogo({ size = 32, className = "" }: GintelLogoProps) {
           }}
         />
         <line x1={mounted ? crossX1 : crossX2} y1={crossY} x2={crossX2} y2={crossY}
-          stroke="#00ff88" strokeWidth={sw} strokeLinecap="round"
+          stroke="var(--logo-stroke)" strokeWidth={sw} strokeLinecap="round"
           style={{ transition: mounted ? "x1 0.4s cubic-bezier(0.4,0,0.2,1) 0.3s" : "none" }}
         />
       </g>
@@ -120,12 +120,12 @@ export const LoadingScreen = memo(function LoadingScreen({ onComplete }: Loading
     >
       {/* Grid */}
       <div className="absolute inset-0 opacity-25" style={{
-        backgroundImage: "linear-gradient(rgba(0,255,136,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(0,255,136,0.05) 1px, transparent 1px)",
+        backgroundImage: "linear-gradient(rgba(var(--accent-rgb),0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(var(--accent-rgb),0.05) 1px, transparent 1px)",
         backgroundSize: "44px 44px",
       }} />
       {/* Radial ambient */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full pointer-events-none" style={{
-        background: "radial-gradient(ellipse, rgba(0,255,136,0.05) 0%, transparent 65%)",
+        background: "radial-gradient(ellipse, rgba(var(--accent-rgb),0.05) 0%, transparent 65%)",
       }} />
 
       <div className={`flex flex-col items-center gap-10 transition-all duration-500 ${phase === "enter" ? "opacity-0 translate-y-5" : "opacity-100 translate-y-0"
@@ -138,7 +138,7 @@ export const LoadingScreen = memo(function LoadingScreen({ onComplete }: Loading
             className="absolute inset-0 animate-spin"
             style={{ animationDuration: "10s", opacity: 0.12 }}
           >
-            <circle cx={c} cy={c} r={R + sw + 4} stroke="#00ff88" strokeWidth="0.8" fill="none" strokeDasharray="5 14" />
+            <circle cx={c} cy={c} r={R + sw + 4} stroke="var(--logo-stroke)" strokeWidth="0.8" fill="none" strokeDasharray="5 14" />
           </svg>
 
           {/* G mark */}
@@ -152,7 +152,7 @@ export const LoadingScreen = memo(function LoadingScreen({ onComplete }: Loading
               </filter>
             </defs>
             <g filter="url(#loader-glow-main)" style={{ transition: "filter 0.7s ease" }}>
-              <circle cx={c} cy={c} r={R} stroke="#00ff88" strokeWidth={sw} strokeLinecap="round" fill="none"
+              <circle cx={c} cy={c} r={R} stroke="var(--logo-stroke)" strokeWidth={sw} strokeLinecap="round" fill="none"
                 strokeDasharray={`${outerDash} ${outerGap}`}
                 strokeDashoffset={isDrawing ? 0 : outerCirc}
                 style={{
@@ -160,13 +160,13 @@ export const LoadingScreen = memo(function LoadingScreen({ onComplete }: Loading
                   transition: "stroke-dashoffset 0.65s cubic-bezier(0.4,0,0.2,1)"
                 }}
               />
-              <circle cx={c} cy={c} r={r} stroke="#00ff88" strokeWidth={sw} strokeLinecap="round" fill="none"
+              <circle cx={c} cy={c} r={r} stroke="var(--logo-stroke)" strokeWidth={sw} strokeLinecap="round" fill="none"
                 strokeDasharray={`${innerDash} ${innerGap}`}
                 strokeDashoffset={isDrawing ? 0 : innerCirc}
                 style={{ transition: "stroke-dashoffset 0.5s cubic-bezier(0.4,0,0.2,1) 0.2s" }}
               />
               <line x1={isDrawing ? crossX1 : crossX2} y1={crossY} x2={crossX2} y2={crossY}
-                stroke="#00ff88" strokeWidth={sw} strokeLinecap="round"
+                stroke="var(--logo-stroke)" strokeWidth={sw} strokeLinecap="round"
                 style={{ transition: "x1 0.35s cubic-bezier(0.4,0,0.2,1) 0.38s" }}
               />
             </g>
@@ -190,12 +190,12 @@ export const LoadingScreen = memo(function LoadingScreen({ onComplete }: Loading
               fontSize: "56px",
               letterSpacing: "0.12em",
               lineHeight: 1,
-              color: "#00ff88",
+              color: "var(--accent)",
               display: "inline-block",
               background: "none",
               WebkitBackgroundClip: "unset",
               textShadow: isGlowing
-                ? "0 0 20px rgba(0,255,136,0.6), 0 0 60px rgba(0,255,136,0.2), 0 0 120px rgba(0,255,136,0.08)"
+                ? `0 0 20px rgba(var(--accent-rgb),0.6), 0 0 60px rgba(var(--accent-rgb),0.2), 0 0 120px rgba(var(--accent-rgb),0.08)`
                 : "none",
               transition: "text-shadow 0.8s ease",
             }}
@@ -225,8 +225,8 @@ export const LoadingScreen = memo(function LoadingScreen({ onComplete }: Loading
             <div style={{
               height: "100%",
               width: `${progress}%`,
-              background: "linear-gradient(90deg, #00cc6a, #00ff88)",
-              boxShadow: "0 0 8px rgba(0,255,136,0.4)",
+              background: "linear-gradient(90deg, var(--accent-dim), var(--accent))",
+              boxShadow: "0 0 8px rgba(var(--accent-rgb),0.4)",
               transition: "width 0.075s linear",
             }} />
           </div>

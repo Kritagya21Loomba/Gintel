@@ -19,7 +19,7 @@ export function ProfileCompleteness({ score }: ProfileCompletenessProps) {
         <div className="w-full bg-border/50 h-2 rounded-full overflow-hidden">
           <div 
             className="h-full rounded-full transition-all duration-500" 
-            style={{ width: `${percentage}%`, backgroundColor: percentage >= 80 ? '#00ff88' : percentage >= 50 ? '#f5a623' : '#f87171' }} 
+            style={{ width: `${percentage}%`, backgroundColor: percentage >= 80 ? 'var(--accent)' : percentage >= 50 ? 'var(--amber)' : 'var(--red)' }} 
           />
         </div>
       </div>
@@ -28,7 +28,7 @@ export function ProfileCompleteness({ score }: ProfileCompletenessProps) {
         {score.checks.map((check, idx) => (
           <div key={idx} className="flex items-center gap-2">
             {check.passed ? (
-              <CheckCircle2 size={14} className="text-[#00ff88]" />
+              <CheckCircle2 size={14} style={{ color: 'var(--accent)' }} />
             ) : (
               <Circle size={14} className="text-muted" />
             )}

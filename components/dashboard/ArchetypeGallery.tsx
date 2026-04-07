@@ -18,7 +18,7 @@ const ARCHETYPE_COLORS: Record<string, { primary: string; glow: string; bg: stri
   "The Specialist": { primary: "#fbbf24", glow: "rgba(251,191,36,0.15)", bg: "rgba(251,191,36,0.05)" },
 };
 
-const DEFAULT_COLOR = { primary: "#00ff88", glow: "rgba(0,255,136,0.12)", bg: "rgba(0,255,136,0.04)" };
+const DEFAULT_COLOR = { primary: "var(--accent)", glow: "var(--accent-glow)", bg: "var(--accent-muted)" };
 
 function getColor(name: string) {
   return ARCHETYPE_COLORS[name] || DEFAULT_COLOR;
@@ -135,7 +135,7 @@ function PrimaryArchetypeSpotlight({ archetype }: { archetype: ArchetypeScore })
                   </feMerge>
                 </filter>
               </defs>
-              <circle cx="50" cy="50" r="44" fill="none" stroke="#1e2d3d" strokeWidth="8" />
+              <circle cx="50" cy="50" r="44" fill="none" stroke="var(--border)" strokeWidth="8" />
               <circle
                 cx="50" cy="50" r="44"
                 fill="none"

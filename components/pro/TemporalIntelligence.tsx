@@ -64,9 +64,9 @@ export function TemporalIntelligence({ temporal }: Props) {
       <div
         className="rounded-lg px-3 py-2 text-left shadow-lg"
         style={{
-          background: "#0d1117",
-          border: "1px solid rgba(0,255,136,0.2)",
-          boxShadow: "0 4px 20px rgba(0,0,0,0.6), 0 0 12px rgba(0,255,136,0.08)",
+          background: "var(--surface)",
+          border: "1px solid var(--accent-glow)",
+          boxShadow: "0 4px 20px rgba(0,0,0,0.4)",
           minWidth: 130,
         }}
       >
@@ -87,7 +87,7 @@ export function TemporalIntelligence({ temporal }: Props) {
           width: 0, height: 0,
           borderLeft: "5px solid transparent",
           borderRight: "5px solid transparent",
-          borderTop: "5px solid rgba(0,255,136,0.2)",
+          borderTop: "5px solid var(--accent-glow)",
         }} />
       </div>
     </div>
@@ -151,7 +151,7 @@ export function TemporalIntelligence({ temporal }: Props) {
                         className="flex-1 aspect-square rounded-sm transition-transform duration-75 hover:scale-125 hover:z-10 relative"
                         style={{
                           backgroundColor: intensity > 0
-                            ? `rgba(0,255,136,${Math.max(0.08, intensity * 0.9)})`
+                            ? `rgba(var(--accent-rgb),${Math.max(0.08, intensity * 0.9)})`
                             : "rgba(255,255,255,0.03)",
                         }}
                         onMouseEnter={(e) => handleCellEnter(e, day, hourIdx, intensity)}

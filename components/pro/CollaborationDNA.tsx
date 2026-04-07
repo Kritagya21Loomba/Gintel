@@ -9,7 +9,7 @@ interface Props {
 }
 
 const STYLE_META: Record<string, { label: string; desc: string; icon: React.ReactNode; accentColor: string }> = {
-  "solo-builder": { label: "Solo Builder", desc: "Ships independently — deep focus, high autonomy", icon: <Cpu size={18} />, accentColor: "#00ff88" },
+  "solo-builder": { label: "Solo Builder", desc: "Ships independently — deep focus, high autonomy", icon: <Cpu size={18} />, accentColor: "var(--accent)" },
   "team-player": { label: "Team Player", desc: "Balanced PRs and reviews — strong collaborative fit", icon: <Users size={18} />, accentColor: "#38bdf8" },
   "mentor": { label: "Mentor", desc: "High review activity + documentation — uplifts others", icon: <Shield size={18} />, accentColor: "#a78bfa" },
   "code-reviewer": { label: "Code Reviewer", desc: "Reviews outweigh PRs — quality gatekeeper", icon: <Search size={18} />, accentColor: "#f5a623" },
@@ -79,11 +79,11 @@ function CollabRadar({
       ))}
 
       {/* Data fill */}
-      <path d={dataPath} fill="rgba(0,255,136,0.1)" stroke="#00ff88" strokeWidth="1.5" strokeLinejoin="round" />
+      <path d={dataPath} fill="var(--accent-muted)" stroke="var(--accent)" strokeWidth="1.5" strokeLinejoin="round" />
 
       {/* Data points */}
       {dataPoints.map((p, i) => (
-        <circle key={i} cx={p.x} cy={p.y} r={3} fill="#00ff88"
+        <circle key={i} cx={p.x} cy={p.y} r={3} fill="var(--accent)"
           style={{ filter: "drop-shadow(0 0 3px rgba(0,255,136,0.8))" }} />
       ))}
 
@@ -91,7 +91,7 @@ function CollabRadar({
       {labelPos.map((l, i) => (
         <text key={i} x={l.x} y={l.y}
           textAnchor="middle" dominantBaseline="middle"
-          fill="#4a5568" fontSize="9" fontFamily="'JetBrains Mono', monospace"
+          fill="var(--muted)" fontSize="9" fontFamily="'JetBrains Mono', monospace"
           style={{ letterSpacing: "0.05em" }}
         >
           {l.label}
@@ -116,8 +116,8 @@ function MergeGauge({ rate }: { rate: number }) {
             <feMerge><feMergeNode in="b" /><feMergeNode in="SourceGraphic" /></feMerge>
           </filter>
         </defs>
-        <circle cx={44} cy={44} r={r} fill="none" stroke="#1e2d3d" strokeWidth={sw} />
-        <circle cx={44} cy={44} r={r} fill="none" stroke="#00ff88" strokeWidth={sw}
+        <circle cx={44} cy={44} r={r} fill="none" stroke="var(--border)" strokeWidth={sw} />
+        <circle cx={44} cy={44} r={r} fill="none" stroke="var(--accent)" strokeWidth={sw}
           strokeLinecap="round" strokeDasharray={`${dash} ${circ}`}
           filter="url(#gauge-glow)"
           style={{ transition: "stroke-dasharray 1.2s cubic-bezier(0.4,0,0.2,1)" }}

@@ -2,64 +2,61 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ── Default theme vars (Matrix) — overridden per-theme via JS ── */
 :root {
-  --bg: #080c10;
-  --surface: #0d1117;
-  --border: #1e2d3d;
-  --accent: #00ff88;
-  --accent-dim: #00cc6a;
-  --cyan: #22d3ee;
-  --cyan-dim: #0891b2;
-  --amber: #f5a623;
-  --sky: #38bdf8;
-  --muted: #4a5568;
-  --text: #e2e8f0;
-  --text-dim: #8892a4;
+  --bg:             #080c10;
+  --surface:        #0d1117;
+  --surface-2:      #111820;
+  --border:         #1e2d3d;
+  --border-bright:  #2d4a5e;
+  --accent:         #00ff88;
+  --accent-dim:     #00cc6a;
+  --accent-muted:   rgba(0,255,136,0.08);
+  --accent-glow:    rgba(0,255,136,0.25);
+  --accent-rgb:     0,255,136;
+  --cyan:           #22d3ee;
+  --cyan-dim:       #0891b2;
+  --amber:          #f5a623;
+  --red:            #f87171;
+  --sky:            #38bdf8;
+  --muted:          #4a5568;
+  --text:           #e2e8f0;
+  --text-dim:       #8892a4;
+  --logo-stroke:    #00ff88;
+  --logo-glow:      rgba(0,255,136,0.5);
+  --grid-color:     rgba(0,255,136,0.03);
+  --scanline-color: rgba(0,0,0,0.03);
 }
 
-* {
-  box-sizing: border-box;
-}
-
-html {
-  scroll-behavior: smooth;
-}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
 
 body {
   background-color: var(--bg);
   color: var(--text);
   font-family: "DM Sans", sans-serif;
   overflow-x: hidden;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* Scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: var(--bg);
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--border);
-  border-radius: 3px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--muted);
-}
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--muted); }
 
 /* Scanline overlay */
 .scanlines::before {
   content: "";
   position: fixed;
   inset: 0;
-  background: repeating-linear-gradient(0deg,
-      transparent,
-      transparent 2px,
-      rgba(0, 0, 0, 0.03) 2px,
-      rgba(0, 0, 0, 0.03) 4px);
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    var(--scanline-color) 2px,
+    var(--scanline-color) 4px
+  );
   pointer-events: none;
   z-index: 9999;
 }
@@ -78,31 +75,24 @@ body {
 /* Grid background */
 .grid-bg {
   background-image:
-    linear-gradient(rgba(0, 255, 136, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 255, 136, 0.03) 1px, transparent 1px);
+    linear-gradient(var(--grid-color) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
   background-size: 40px 40px;
 }
 
 /* Glow effects */
 .glow-accent {
-  box-shadow: 0 0 20px rgba(0, 255, 136, 0.3), 0 0 60px rgba(0, 255, 136, 0.1);
+  box-shadow: 0 0 20px var(--accent-glow), 0 0 60px rgba(var(--accent-rgb),0.1);
 }
-
 .glow-text {
-  text-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+  text-shadow: 0 0 20px var(--logo-glow);
 }
 
 /* Score ring animation */
 @keyframes score-ring {
-  from {
-    stroke-dashoffset: 314;
-  }
-
-  to {
-    stroke-dashoffset: var(--target-offset);
-  }
+  from { stroke-dashoffset: 314; }
+  to   { stroke-dashoffset: var(--target-offset); }
 }
-
 .score-ring-path {
   animation: score-ring 1.5s ease forwards;
   animation-delay: 0.5s;
@@ -114,12 +104,8 @@ body {
   transform: translateY(16px);
   animation: fadeUp 0.5s ease forwards;
 }
-
 @keyframes fadeUp {
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 /* Terminal cursor */
@@ -127,69 +113,37 @@ body {
   content: "_";
   animation: blink 1s step-end infinite;
 }
-
-@keyframes blink {
-  50% {
-    opacity: 0;
-  }
-}
+@keyframes blink { 50% { opacity: 0; } }
 
 /* Heatmap cell */
-.heatmap-cell {
-  transition: transform 0.1s ease, opacity 0.1s ease;
-}
-
-.heatmap-cell:hover {
-  transform: scale(1.5);
-  z-index: 10;
-}
+.heatmap-cell { transition: transform 0.1s ease, opacity 0.1s ease; }
+.heatmap-cell:hover { transform: scale(1.5); z-index: 10; }
 
 /* Card hover */
-.card-hover {
-  transition: border-color 0.2s ease, transform 0.2s ease;
-}
-
+.card-hover { transition: border-color 0.2s ease, transform 0.2s ease; }
 .card-hover:hover {
-  border-color: rgba(0, 255, 136, 0.3);
+  border-color: rgba(var(--accent-rgb), 0.3);
   transform: translateY(-2px);
 }
 
 /* Bar fill animation */
 @keyframes bar-fill {
-  from {
-    width: 0%;
-  }
-
-  to {
-    width: var(--target-width);
-  }
+  from { width: 0%; }
+  to   { width: var(--target-width); }
 }
-
 .bar-animated {
   animation: bar-fill 1s ease forwards;
   animation-delay: var(--delay, 0.1s);
 }
 
 /* PDF Export Mode */
-.pdf-export-mode nav.sticky {
-  position: relative !important;
-}
-
+.pdf-export-mode nav.sticky { position: relative !important; }
 .pdf-export-mode .scanlines::before,
-.pdf-export-mode .noise::after {
-  display: none !important;
-}
+.pdf-export-mode .noise::after { display: none !important; }
+.pdf-export-mode * { animation: none !important; transition: none !important; }
 
-.pdf-export-mode * {
-  animation: none !important;
-  transition: none !important;
-}
-
-/* ── Archetype feature prominence ─────────────────────────── */
-.archetype-glow {
-  position: relative;
-}
-
+/* Archetype feature prominence */
+.archetype-glow { position: relative; }
 .archetype-glow::before {
   content: "";
   position: absolute;
@@ -203,26 +157,18 @@ body {
   pointer-events: none;
 }
 
-/* ── Score ring: use SVG filter only — no box-shadow ──────── */
-/* Ensure no box-shadow leaks onto ScoreRing */
-.score-ring-container {
-  filter: none !important;
-  box-shadow: none !important;
-}
+.score-ring-container { filter: none !important; box-shadow: none !important; }
 
-/* ── Better focus ring ────────────────────────────────────── */
 *:focus-visible {
-  outline: 1.5px solid rgba(0, 255, 136, 0.5);
+  outline: 1.5px solid rgba(var(--accent-rgb), 0.5);
   outline-offset: 2px;
 }
 
-/* ── Section divider accent ───────────────────────────────── */
 .section-label {
   display: flex;
   align-items: center;
   gap: 12px;
 }
-
 .section-label::before {
   content: "";
   width: 4px;
@@ -232,22 +178,19 @@ body {
   flex-shrink: 0;
 }
 
-/* ── Stat cards ───────────────────────────────────────────── */
-.stat-value-glow {
-  text-shadow: 0 0 12px currentColor;
-}
+.stat-value-glow { text-shadow: 0 0 12px currentColor; }
 
-/* ── Responsive padding helpers ───────────────────────────── */
 @media (max-width: 640px) {
-  .px-responsive {
-    padding-left: 1rem;
-    padding-right: 1rem;
-  }
+  .px-responsive { padding-left: 1rem; padding-right: 1rem; }
 }
 
-/* ── Cursor: hide default everywhere ─────────────────────── */
-html,
-body,
-* {
-  /* cursor: none is applied by the CustomCursor component via JS */
+/* ── X-Ray theme overrides — light bg needs inverted scanlines ── */
+[data-theme="xray"] .noise::after { opacity: 0.15; }
+[data-theme="xray"] .scanlines::before { opacity: 0.3; }
+
+/* Smooth theme transitions on key surfaces */
+.bg-surface, .bg-bg,
+[class*="bg-surface"], [class*="bg-bg"],
+[class*="border-border"] {
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
 }

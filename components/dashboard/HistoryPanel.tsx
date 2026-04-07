@@ -35,7 +35,7 @@ function CustomTooltip({ active, payload, label }: any) {
   const snapshotData = payload[0].payload as HistoricalSnapshot;
 
   return (
-    <div className="bg-[#0d1117] border border-[#2d4a5e] rounded-md p-3 shadow-xl pointer-events-none">
+    <div className="bg-surface border border-border-bright rounded-md p-3 shadow-xl pointer-events-none">
       <p className="font-mono text-[10px] text-muted mb-2 border-b border-border/40 pb-1">
         Captured: <span className="text-text">{snapshotData.dateStr}</span>
       </p>
@@ -149,7 +149,7 @@ export function HistoryPanel({ data }: HistoryPanelProps) {
                   <Save size={20} className="text-accent mb-2" />
                   <button 
                     onClick={handleRecordSnapshot}
-                    className="font-mono text-xs font-bold text-bg bg-accent hover:bg-[#00e67a] active:scale-95 transition-all px-4 py-2 rounded-lg uppercase tracking-wider w-full"
+                    className="font-mono text-xs font-bold text-bg bg-accent hover:opacity-90 active:scale-95 transition-all px-4 py-2 rounded-lg uppercase tracking-wider w-full"
                   >
                     Record Snapshot
                   </button>
@@ -172,14 +172,14 @@ export function HistoryPanel({ data }: HistoryPanelProps) {
                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#1f2937" opacity={0.5} />
                  <XAxis 
                    dataKey="dateStr" 
-                   tick={{ fontFamily: "JetBrains Mono, monospace", fontSize: 10, fill: "#6b7280" }}
+                   tick={{ fontFamily: "JetBrains Mono, monospace", fontSize: 10, fill: "var(--muted)" }}
                    axisLine={{ stroke: "#374151", strokeWidth: 1 }}
                    tickLine={false}
                    tickMargin={12}
                  />
                  <YAxis 
                    domain={['auto', 100]}
-                   tick={{ fontFamily: "JetBrains Mono, monospace", fontSize: 10, fill: "#6b7280" }}
+                   tick={{ fontFamily: "JetBrains Mono, monospace", fontSize: 10, fill: "var(--muted)" }}
                    axisLine={false}
                    tickLine={false}
                  />
@@ -187,10 +187,10 @@ export function HistoryPanel({ data }: HistoryPanelProps) {
                  <Line 
                    type="monotone" 
                    dataKey="score" 
-                   stroke="#00ff88" 
+                   stroke="var(--accent)" 
                    strokeWidth={3}
-                   dot={{ r: 4, fill: "#00ff88", strokeWidth: 2, stroke: "#0d1117" }}
-                   activeDot={{ r: 6, fill: "#00ff88", stroke: "#0d1117", strokeWidth: 2 }}
+                   dot={{ r: 4, fill: "var(--accent)", strokeWidth: 2, stroke: "var(--bg)" }}
+                   activeDot={{ r: 6, fill: "var(--accent)", stroke: "var(--bg)", strokeWidth: 2 }}
                    animationDuration={1500}
                  />
                </LineChart>

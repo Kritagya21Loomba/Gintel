@@ -10,16 +10,17 @@ export function formatNumber(n: number): string {
   return n.toString();
 }
 
+/** Returns a CSS variable reference so score rings/text follow the active theme. */
 export function scoreColor(score: number): string {
-  if (score >= 80) return "#00ff88";
-  if (score >= 60) return "#f5a623";
-  return "#f87171";
+  if (score >= 80) return "var(--accent)";
+  if (score >= 60) return "var(--amber)";
+  return "var(--red)";
 }
 
 export function impactLabel(impact: "high" | "medium" | "low") {
   return {
-    high: { label: "HIGH IMPACT", color: "#f87171" },
-    medium: { label: "MED IMPACT", color: "#f5a623" },
-    low: { label: "LOW IMPACT", color: "#4a5568" },
+    high:   { label: "HIGH IMPACT",   color: "var(--red)" },
+    medium: { label: "MED IMPACT",    color: "var(--amber)" },
+    low:    { label: "LOW IMPACT",    color: "var(--muted)" },
   }[impact];
 }

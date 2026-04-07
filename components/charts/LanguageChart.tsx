@@ -13,8 +13,8 @@ function CustomTooltip({ active, payload }: any) {
   return (
     <div
       style={{
-        background: "#0d1117",
-        border: "1px solid #2d4a5e",
+        background: "var(--surface)",
+        border: "1px solid var(--border-bright)",
         borderRadius: 6,
         padding: "8px 12px",
         boxShadow: "0 4px 12px rgba(0,0,0,0.4)",
@@ -29,11 +29,11 @@ function CustomTooltip({ active, payload }: any) {
             backgroundColor: entry.payload.color,
           }}
         />
-        <span style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 11, color: "#e2e8f0", fontWeight: 600 }}>
+        <span style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 11, color: "var(--text)", fontWeight: 600 }}>
           {entry.name}
         </span>
       </div>
-      <p style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 12, color: "#e2e8f0" }}>
+      <p style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 12, color: "var(--text)" }}>
         {entry.value}%
       </p>
     </div>

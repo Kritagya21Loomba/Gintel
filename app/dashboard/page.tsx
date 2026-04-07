@@ -302,7 +302,7 @@ function DashboardContent() {
                           className="font-mono text-sm font-bold"
                           style={{
                             color:
-                              s.score >= 80 ? "#00ff88" : s.score >= 65 ? "#f5a623" : "#f87171",
+                              s.score >= 80 ? "var(--accent)" : s.score >= 65 ? "var(--amber)" : "var(--red)",
                           }}
                         >
                           {s.score}
@@ -399,7 +399,7 @@ function DashboardContent() {
                             <span
                               className="font-mono text-[10px] font-bold"
                               style={{
-                                color: dim.score >= 80 ? "#00ff88" : dim.score >= 65 ? "#f5a623" : "#f87171"
+                                color: dim.score >= 80 ? "var(--accent)" : dim.score >= 65 ? "var(--amber)" : "var(--red)"
                               }}
                             >
                               {dim.score}
@@ -410,7 +410,7 @@ function DashboardContent() {
                               className="h-full rounded-full"
                               style={{
                                 width: `${dim.score}%`,
-                                backgroundColor: dim.score >= 80 ? "#00ff88" : dim.score >= 65 ? "#f5a623" : "#f87171"
+                                backgroundColor: dim.score >= 80 ? "var(--accent)" : dim.score >= 65 ? "var(--amber)" : "var(--red)"
                               }}
                             />
                           </div>
