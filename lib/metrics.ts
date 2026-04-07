@@ -20,7 +20,7 @@ const DEFAULT_METRICS: PlatformMetrics = {
 export async function fetchGlobalMetrics(): Promise<PlatformMetrics> {
   if (typeof window === "undefined") return DEFAULT_METRICS;
   try {
-    const res = await fetch("/api/metrics");
+    const res = await fetch(`/api/metrics?t=${Date.now()}`, { cache: "no-store" });
     if (!res.ok) return DEFAULT_METRICS;
     return await res.json();
   } catch {
