@@ -38,10 +38,26 @@ function AnimatedCounter({ target, duration = 2000 }: { target: number; duration
   const animated = useRef(false);
 
   useEffect(() => {
+    // If target changes after we already animated, animate again from current count to new target
+    if (animated.current && target > count) {
+      const startTime = performance.now();
+      const startCount = count;
+      const step = (currentTime: number) => {
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / (duration / 2), 1);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        setCount(Math.floor(startCount + eased * (target - startCount)));
+        if (progress < 1) requestAnimationFrame(step);
+      };
+      requestAnimationFrame(step);
+    }
+  }, [target]);
+
+  useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting) {
-          if (!animated.current) {
+          if (!animated.current && target > 0) {
             animated.current = true;
             const startTime = performance.now();
             const step = (currentTime: number) => {
