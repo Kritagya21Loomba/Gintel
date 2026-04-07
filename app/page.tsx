@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect, useRef, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { signIn, useSession } from "next-auth/react";
 import { Github, ArrowRight, Zap, BarChart2, Target, Star, Loader2, Sparkles } from "lucide-react";
-import { getMetrics, type PlatformMetrics } from "@/lib/metrics";
+import { getMetrics, resetAllMetrics, type PlatformMetrics } from "@/lib/metrics";
 import { GintelLogo, LoadingScreen } from "@/components/ui/GintelLogo";
 
 const FEATURES = [
@@ -70,7 +70,16 @@ function AnimatedCounter({ target, duration = 2000 }: { target: number; duration
 }
 
 export default function Home() {
+  return (
+    <Suspense fallback={null}>
+      <HomeContent />
+    </Suspense>
+  );
+}
+
+function HomeContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { data: session, status } = useSession();
   const [loading, setLoading] = useState(false);
   const [insightIdx, setInsightIdx] = useState(0);
@@ -79,6 +88,11 @@ export default function Home() {
   const [contentVisible, setContentVisible] = useState(false);
 
   useEffect(() => {
+    // ?reset=1 wipes all metrics + per-user localStorage cache — use for testing
+    if (searchParams.get("reset") === "1") {
+      resetAllMetrics();
+      router.replace("/");
+    }
     setMetrics(getMetrics());
   }, []);
 
@@ -273,9 +287,9 @@ export default function Home() {
           <div className="max-w-5xl mx-auto px-6">
             <div className="flex flex-wrap justify-center gap-8 md:gap-0 md:divide-x md:divide-border/50">
               {[
-                { label: "Developers analyzed", value: metrics?.developersAnalyzed || 22 },
-                { label: "Repos scanned", value: metrics?.reposScanned || 88 },
-                { label: "CVs analyzed", value: metrics?.cvInsightsGenerated || 2 },
+                { label: "Developers analyzed", value: metrics?.developersAnalyzed ?? 0 },
+                { label: "Repos scanned", value: metrics?.reposScanned ?? 0 },
+                { label: "CVs analyzed", value: metrics?.cvInsightsGenerated ?? 0 },
               ].map((s) => (
                 <div key={s.label} className="text-center px-10">
                   <div className="font-display font-extrabold text-3xl" style={{ color: "var(--cyan)" }}>
@@ -289,17 +303,64 @@ export default function Home() {
         </section>
 
         {/* Footer */}
-        <footer className="relative z-10 border-t border-border/30 py-8 px-6">
-          <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
-            <div className="flex items-center gap-2">
-              <GintelLogo size={16} />
-              <span className="font-mono text-xs text-muted">
-                Gintel — Not affiliated with GitHub, Inc.
-              </span>
+        <footer className="relative z-10 border-t border-border/30 py-10 px-6">
+          <div className="max-w-5xl mx-auto flex flex-col gap-6">
+            {/* Top row */}
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="flex items-center gap-2">
+                <GintelLogo size={16} />
+                <span className="font-mono text-xs text-muted">
+                  Gintel — Not affiliated with GitHub, Inc.
+                </span>
+              </div>
+              <a
+                href="/feedback"
+                className="font-mono text-xs border border-border/60 rounded-lg px-4 py-2 text-text-dim hover:border-accent/40 hover:text-accent transition-all"
+              >
+                Leave a review or report an issue →
+              </a>
             </div>
-            <div className="flex items-center gap-2 text-muted">
-              <Github size={14} />
-              <span className="font-mono text-xs">Open Source</span>
+
+            {/* Divider */}
+            <div className="h-px bg-border/30" />
+
+            {/* Bottom row */}
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+              {/* Built by */}
+              <div className="flex items-center gap-3">
+                <span className="font-mono text-[10px] text-muted tracking-widest">BUILT BY</span>
+                <span className="font-mono text-xs text-text">Kritagya Loomba</span>
+                <a
+                  href="https://github.com/Kritagya21Loomba"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-mono text-xs text-text-dim hover:text-accent transition-colors flex items-center gap-1"
+                >
+                  <Github size={12} />
+                  GitHub
+                </a>
+                <a
+                  href="https://linkedin.com/in/kritagyaloomba"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-mono text-xs text-text-dim hover:text-accent transition-colors"
+                >
+                  LinkedIn
+                </a>
+              </div>
+
+              {/* Tech stack */}
+              <div className="flex items-center gap-2 flex-wrap justify-center sm:justify-end">
+                <span className="font-mono text-[10px] text-muted tracking-widest">MADE WITH</span>
+                {["Next.js", "TypeScript", "Tailwind CSS", "NextAuth", "GitHub API"].map((tech) => (
+                  <span
+                    key={tech}
+                    className="font-mono text-[10px] border border-border/40 rounded px-2 py-0.5 text-muted"
+                  >
+                    {tech}
+                  </span>
+                ))}
+              </div>
             </div>
           </div>
         </footer>

@@ -6,9 +6,7 @@ type CursorMode = "default" | "pointer" | "text" | "crosshair" | "wait";
 
 export function CustomCursor() {
   const arrowRef = useRef<HTMLDivElement>(null);
-  const ringRef = useRef<HTMLDivElement>(null);
   const pos = useRef({ x: -200, y: -200 });
-  const lerpPos = useRef({ x: -200, y: -200 });
   const rafId = useRef<number>(0);
   const [mode, setMode] = useState<CursorMode>("default");
   const [pressed, setPressed] = useState(false);
@@ -47,18 +45,10 @@ export function CustomCursor() {
     document.addEventListener("mouseleave", onLeave);
     document.addEventListener("mouseenter", onEnter);
 
-    const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
-
     const tick = () => {
       // Arrow follows mouse instantly — tip always at exact cursor position
       if (arrowRef.current) {
         arrowRef.current.style.transform = `translate(${pos.current.x}px, ${pos.current.y}px)`;
-      }
-      // Decorative ring lerps behind for pointer mode
-      lerpPos.current.x = lerp(lerpPos.current.x, pos.current.x, 0.14);
-      lerpPos.current.y = lerp(lerpPos.current.y, pos.current.y, 0.14);
-      if (ringRef.current) {
-        ringRef.current.style.transform = `translate(${lerpPos.current.x}px, ${lerpPos.current.y}px)`;
       }
       rafId.current = requestAnimationFrame(tick);
     };
@@ -137,37 +127,7 @@ export function CustomCursor() {
         )}
       </div>
 
-      {/* ── Decorative lagging ring — only shown in pointer mode ── */}
-      {mode === "pointer" && (
-        <div
-          ref={ringRef}
-          className="fixed top-0 left-0 pointer-events-none z-[99998]"
-          style={{
-            willChange: "transform",
-            marginLeft: -14,
-            marginTop: -14,
-            opacity: visible ? 1 : 0,
-            transition: "opacity 0.2s ease",
-          }}
-        >
-          <svg
-            width="28" height="28" viewBox="0 0 28 28"
-            style={{ display: "block", transform: `scale(${pressed ? 0.8 : 1})`, transition: "transform 0.18s ease" }}
-          >
-            <defs>
-              <filter id="ptr-glow" x="-50%" y="-50%" width="200%" height="200%">
-                <feGaussianBlur stdDeviation="2" result="b" />
-                <feMerge><feMergeNode in="b" /><feMergeNode in="SourceGraphic" /></feMerge>
-              </filter>
-            </defs>
-            <circle cx="14" cy="14" r="11" stroke="#00ff88" strokeWidth="1" fill="rgba(0,255,136,0.04)" filter="url(#ptr-glow)" />
-            <line x1="14" y1="3" x2="14" y2="7" stroke="#00ff88" strokeWidth="1.2" strokeLinecap="round" />
-            <line x1="14" y1="21" x2="14" y2="25" stroke="#00ff88" strokeWidth="1.2" strokeLinecap="round" />
-            <line x1="3" y1="14" x2="7" y2="14" stroke="#00ff88" strokeWidth="1.2" strokeLinecap="round" />
-            <line x1="21" y1="14" x2="25" y2="14" stroke="#00ff88" strokeWidth="1.2" strokeLinecap="round" />
-          </svg>
-        </div>
-      )}
+
     </>
   );
 }

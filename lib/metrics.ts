@@ -15,11 +15,11 @@ export interface PlatformMetrics {
 
 const METRICS_KEY = "gpia_metrics";
 
-// Believable seed numbers — low enough to feel early-stage, non-zero.
+// Start from zero — real numbers only.
 const DEFAULT_METRICS: PlatformMetrics = {
-  developersAnalyzed: 22,
-  cvInsightsGenerated: 2,
-  reposScanned: 88,
+  developersAnalyzed: 0,
+  cvInsightsGenerated: 0,
+  reposScanned: 0,
   lastUpdated: new Date().toISOString(),
 };
 
@@ -35,7 +35,7 @@ function getMetricsFromStorage(): PlatformMetrics {
 
     // Migration: old key "insightsGenerated" → "cvInsightsGenerated"
     if ("insightsGenerated" in parsed && !("cvInsightsGenerated" in parsed)) {
-      parsed.cvInsightsGenerated = 2; // reset to seed rather than carry over stale huge number
+      parsed.cvInsightsGenerated = 0;
       delete parsed.insightsGenerated;
       localStorage.setItem(METRICS_KEY, JSON.stringify(parsed));
     }
@@ -61,6 +61,22 @@ export function getMetrics(): PlatformMetrics {
 }
 
 /**
+ * Wipes all Gintel-related keys from localStorage, resetting metrics and
+ * per-user tracking. Useful for testing.
+ */
+export function resetAllMetrics(): void {
+  if (typeof window === "undefined") return;
+  const keysToRemove: string[] = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key && (key.startsWith("gpia_") || key.startsWith("gintel_"))) {
+      keysToRemove.push(key);
+    }
+  }
+  keysToRemove.forEach((k) => localStorage.removeItem(k));
+}
+
+/**
  * Call on sign-in / dashboard load with the authenticated GitHub username.
  * Increments developersAnalyzed by 1 the very first time this user is seen,
  * then never again — even across refreshes or re-logins.
@@ -83,9 +99,6 @@ export function recordDeveloperIfNew(username: string): PlatformMetrics {
  * On first sign-in: adds the full repo count to reposScanned.
  * On subsequent loads: adds only the delta (new repos since last visit).
  * This handles the case where a user creates new repos after initial registration.
- *
- * @param username      GitHub username (used to namespace the stored count)
- * @param currentCount  The user's current total public_repos from the GitHub API
  */
 export function recordReposDelta(username: string, currentCount: number): PlatformMetrics {
   if (typeof window === "undefined") return getMetricsFromStorage();
@@ -100,14 +113,13 @@ export function recordReposDelta(username: string, currentCount: number): Platfo
     saveMetrics(m);
   }
 
-  // Always update stored count so future visits only count new repos
   localStorage.setItem(repoKey, String(currentCount));
   return m;
 }
 
 /**
  * Call when a user successfully generates CV insights.
- * Only increments once per user lifetime (keyed by username or "demo").
+ * Only increments once per user lifetime (keyed by username).
  */
 export function recordCvInsightIfNew(username: string): PlatformMetrics {
   if (typeof window === "undefined") return getMetricsFromStorage();
@@ -122,7 +134,7 @@ export function recordCvInsightIfNew(username: string): PlatformMetrics {
   return m;
 }
 
-// ─── Legacy helpers (kept for safety, no longer called by main flow) ───────
+// ─── Legacy helpers (kept for safety) ───────────────────────
 
 export function addReposScanned(count: number): PlatformMetrics {
   const m = getMetricsFromStorage();
