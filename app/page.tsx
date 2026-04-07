@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, Suspense } from "react";
+import { useState, useEffect, useRef, Suspense, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { signIn, signOut, useSession } from "next-auth/react";
 import { Github, ArrowRight, Zap, BarChart2, Target, Star, Loader2, Sparkles } from "lucide-react";
@@ -108,10 +108,10 @@ function HomeContent() {
 
 
 
-  function handleLoaderComplete() {
+  const handleLoaderComplete = useCallback(() => {
     setShowLoader(false);
     setTimeout(() => setContentVisible(true), 50);
-  }
+  }, []);
 
   function handleSignIn() {
     signIn("github", { callbackUrl: "/dashboard?mode=live" });

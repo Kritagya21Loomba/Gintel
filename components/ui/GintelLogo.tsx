@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, memo } from "react";
 
 interface GintelLogoProps {
   size?: number;
@@ -70,7 +70,7 @@ interface LoadingScreenProps {
   onComplete: () => void;
 }
 
-export function LoadingScreen({ onComplete }: LoadingScreenProps) {
+export const LoadingScreen = memo(function LoadingScreen({ onComplete }: LoadingScreenProps) {
   const [phase, setPhase] = useState<"enter" | "draw" | "glow" | "text" | "exit">("enter");
   const [progress, setProgress] = useState(0);
 
@@ -242,4 +242,4 @@ export function LoadingScreen({ onComplete }: LoadingScreenProps) {
       </div>
     </div>
   );
-}
+});
