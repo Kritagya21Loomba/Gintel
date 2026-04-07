@@ -52,12 +52,17 @@ export async function recordDeveloperIfNew(username: string): Promise<void> {
   const alreadySeen = localStorage.getItem(seenKey) === "true";
   
   if (!alreadySeen) {
-    localStorage.setItem(seenKey, "true");
-    await fetch("/api/metrics", {
+    const res = await fetch("/api/metrics", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ type: "developer", amount: 1 }),
-    }).catch(() => {});
+    }).catch((err) => console.error("Metrics failed: ", err));
+
+    if (res && res.ok) {
+      localStorage.setItem(seenKey, "true");
+    } else if (res) {
+      console.error("Metrics API returned error:", await res.text());
+    }
   }
 }
 
@@ -71,15 +76,20 @@ export async function recordReposDelta(username: string, currentCount: number): 
   const lastKnown = stored !== null ? parseInt(stored, 10) : 0;
   const delta = Math.max(0, currentCount - lastKnown);
 
-  // Update their local tracking memory immediately
-  localStorage.setItem(repoKey, String(currentCount));
-
   if (delta > 0) {
-    await fetch("/api/metrics", {
+    const res = await fetch("/api/metrics", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ type: "repos", amount: delta }),
-    }).catch(() => {});
+    }).catch((err) => console.error("Metrics failed: ", err));
+
+    if (res && res.ok) {
+      localStorage.setItem(repoKey, String(currentCount));
+    } else if (res) {
+      console.error("Metrics API returned error:", await res.text());
+    }
+  } else {
+    localStorage.setItem(repoKey, String(currentCount));
   }
 }
 
@@ -92,12 +102,17 @@ export async function recordCvInsightIfNew(username: string): Promise<void> {
   const alreadyCounted = localStorage.getItem(cvKey) === "true";
   
   if (!alreadyCounted) {
-    localStorage.setItem(cvKey, "true");
-    await fetch("/api/metrics", {
+    const res = await fetch("/api/metrics", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ type: "cv", amount: 1 }),
-    }).catch(() => {});
+    }).catch((err) => console.error("Metrics failed: ", err));
+
+    if (res && res.ok) {
+      localStorage.setItem(cvKey, "true");
+    } else if (res) {
+      console.error("Metrics API returned error:", await res.text());
+    }
   }
 }
 
