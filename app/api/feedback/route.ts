@@ -8,7 +8,7 @@ import { NextResponse } from "next/server";
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY || "";
 const TO_EMAIL = process.env.FEEDBACK_TO_EMAIL || "kritagyaloomba@gmail.com";
-const FROM_EMAIL = process.env.FEEDBACK_FROM_EMAIL || "gintel-feedback@resend.dev";
+const FROM_EMAIL = process.env.FEEDBACK_FROM_EMAIL || "onboarding@resend.dev";
 
 type FeedbackType = "review" | "bug" | "feature" | "other";
 

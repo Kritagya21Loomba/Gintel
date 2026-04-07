@@ -13,7 +13,7 @@ export interface PlatformMetrics {
   lastUpdated: string;
 }
 
-const METRICS_KEY = "gpia_metrics";
+const METRICS_KEY = "gintel_metrics_v2";
 
 // Start from zero — real numbers only.
 const DEFAULT_METRICS: PlatformMetrics = {
@@ -83,7 +83,7 @@ export function resetAllMetrics(): void {
  */
 export function recordDeveloperIfNew(username: string): PlatformMetrics {
   if (typeof window === "undefined") return getMetricsFromStorage();
-  const seenKey = `gintel_user_seen:${username}`;
+  const seenKey = `gintel_user_seen_v2:${username}`;
   const alreadySeen = localStorage.getItem(seenKey) === "true";
   const m = getMetricsFromStorage();
   if (!alreadySeen) {
@@ -102,7 +102,7 @@ export function recordDeveloperIfNew(username: string): PlatformMetrics {
  */
 export function recordReposDelta(username: string, currentCount: number): PlatformMetrics {
   if (typeof window === "undefined") return getMetricsFromStorage();
-  const repoKey = `gintel_user_repos:${username}`;
+  const repoKey = `gintel_user_repos_v2:${username}`;
   const stored = localStorage.getItem(repoKey);
   const lastKnown = stored !== null ? parseInt(stored, 10) : 0;
   const delta = Math.max(0, currentCount - lastKnown);
@@ -123,7 +123,7 @@ export function recordReposDelta(username: string, currentCount: number): Platfo
  */
 export function recordCvInsightIfNew(username: string): PlatformMetrics {
   if (typeof window === "undefined") return getMetricsFromStorage();
-  const cvKey = `gintel_user_cv:${username}`;
+  const cvKey = `gintel_user_cv_v2:${username}`;
   const alreadyCounted = localStorage.getItem(cvKey) === "true";
   const m = getMetricsFromStorage();
   if (!alreadyCounted) {
