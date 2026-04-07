@@ -9,6 +9,7 @@ const handler = NextAuth({
       authorization: {
         params: {
           scope: "read:user repo",
+          prompt: "consent",
         },
       },
     }),
