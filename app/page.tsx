@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { signIn, useSession } from "next-auth/react";
 import { Github, ArrowRight, Zap, BarChart2, Target, Star, Loader2, Sparkles } from "lucide-react";
-import { getMetrics, resetAllMetrics, type PlatformMetrics } from "@/lib/metrics";
+import { fetchGlobalMetrics, resetAllMetrics, type PlatformMetrics } from "@/lib/metrics";
 import { GintelLogo, LoadingScreen } from "@/components/ui/GintelLogo";
 
 const FEATURES = [
@@ -87,7 +87,7 @@ function HomeContent() {
       resetAllMetrics();
       router.replace("/");
     }
-    setMetrics(getMetrics());
+    fetchGlobalMetrics().then(setMetrics);
   }, []);
 
 
