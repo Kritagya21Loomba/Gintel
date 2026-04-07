@@ -20,7 +20,7 @@ const DEFAULT_METRICS: PlatformMetrics = {
 export async function fetchGlobalMetrics(): Promise<PlatformMetrics> {
   if (typeof window === "undefined") return DEFAULT_METRICS;
   try {
-    const res = await fetch(`/api/metrics?t=${Date.now()}`, { cache: "no-store" });
+    const res = await fetch(`/api/platform-data?t=${Date.now()}`, { cache: "no-store" });
     if (!res.ok) return DEFAULT_METRICS;
     return await res.json();
   } catch {
@@ -52,7 +52,7 @@ export async function recordDeveloperIfNew(username: string): Promise<void> {
   const alreadySeen = localStorage.getItem(seenKey) === "true";
   
   if (!alreadySeen) {
-    const res = await fetch("/api/metrics", {
+    const res = await fetch("/api/platform-data", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ type: "developer", amount: 1 }),
@@ -77,7 +77,7 @@ export async function recordReposDelta(username: string, currentCount: number): 
   const delta = Math.max(0, currentCount - lastKnown);
 
   if (delta > 0) {
-    const res = await fetch("/api/metrics", {
+    const res = await fetch("/api/platform-data", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ type: "repos", amount: delta }),
@@ -102,7 +102,7 @@ export async function recordCvInsightIfNew(username: string): Promise<void> {
   const alreadyCounted = localStorage.getItem(cvKey) === "true";
   
   if (!alreadyCounted) {
-    const res = await fetch("/api/metrics", {
+    const res = await fetch("/api/platform-data", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ type: "cv", amount: 1 }),
