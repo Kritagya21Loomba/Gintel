@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { signIn, useSession } from "next-auth/react";
+import { signIn, signOut, useSession } from "next-auth/react";
 import { Github, ArrowRight, Zap, BarChart2, Target, Star, Loader2, Sparkles } from "lucide-react";
 import { fetchGlobalMetrics, resetAllMetrics, type PlatformMetrics } from "@/lib/metrics";
 import { GintelLogo, LoadingScreen } from "@/components/ui/GintelLogo";
@@ -150,15 +150,23 @@ function HomeContent() {
               <span style={{ color: "var(--cyan)" }}>LIVE BETA</span>
             </span>
             {isLoggedIn && (
-              <div className="flex items-center gap-2 border border-border/50 rounded-full pl-1 pr-3 py-1">
-                <img
-                  src={session.user?.image || ""}
-                  alt=""
-                  className="w-5 h-5 rounded-full border border-border"
-                />
-                <span className="font-mono text-xs text-accent hidden sm:block">
-                  {session.user?.name}
-                </span>
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 border border-border/50 rounded-full pl-1 pr-3 py-1">
+                  <img
+                    src={session.user?.image || ""}
+                    alt=""
+                    className="w-5 h-5 rounded-full border border-border"
+                  />
+                  <span className="font-mono text-xs text-accent hidden sm:block">
+                    {session.user?.name}
+                  </span>
+                </div>
+                <button
+                  onClick={() => signOut({ callbackUrl: "/" })}
+                  className="font-mono text-xs text-muted hover:text-red-400 transition-colors"
+                >
+                  Sign out
+                </button>
               </div>
             )}
           </div>
